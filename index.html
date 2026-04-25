@@ -2,98 +2,95 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚖️ LUCA // 敗訴判定所</title>
+    <title>⚖️ LUCA // 靈魂審訊室</title>
     <style>
-        :root { --main-red: #ff3b3b; --bg-black: #050505; }
-        body { background: var(--bg-black); color: #fff; font-family: 'Times New Roman', 'PingFang TC', serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
-        
-        /* 掃描線動畫 */
-        .scanner-line { width: 100%; height: 3px; background: var(--main-red); position: fixed; top: -10px; left: 0; z-index: 100; box-shadow: 0 0 15px var(--main-red); display: none; }
-        @keyframes scanAnim { 0% { top: 0%; } 100% { top: 100%; } }
-
-        .court-frame { width: 420px; border: 1px solid #222; padding: 50px; text-align: center; background: rgba(0,0,0,0.8); position: relative; box-shadow: 0 0 50px rgba(0,0,0,1); }
-        h1 { letter-spacing: 8px; font-weight: 100; color: #fff; margin-bottom: 5px; font-size: 1.8rem; }
-        .sub-title { font-size: 0.6rem; color: #444; letter-spacing: 3px; margin-bottom: 40px; }
-
-        #result-display { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--main-red); line-height: 1.6; margin: 20px 0; border: 1px solid #111; padding: 15px; }
-        
-        input { width: 100%; padding: 12px; background: transparent; border: none; border-bottom: 1px solid #333; color: #fff; text-align: center; outline: none; font-size: 1rem; transition: 0.3s; }
-        input:focus { border-bottom: 1px solid #fff; }
-
-        button { margin-top: 30px; background: transparent; color: #fff; border: 1px solid #fff; padding: 12px 40px; cursor: pointer; font-size: 0.8rem; letter-spacing: 2px; transition: 0.4s; }
-        button:hover { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
-
-        .fee-meter { position: fixed; bottom: 30px; left: 30px; font-family: monospace; color: #222; font-size: 0.8rem; }
-        #money { color: #444; }
+        body { background: #000; color: #fff; font-family: 'PingFang TC', serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .office { width: 90%; max-width: 500px; border: 1px solid #222; padding: 40px; background: linear-gradient(145deg, #0a0a0a, #000); box-shadow: 0 0 50px rgba(0,0,0,1); }
+        .luca-portrait { font-size: 0.7rem; color: #333; margin-bottom: 20px; border-bottom: 1px solid #111; padding-bottom: 10px; }
+        #dialogue { min-height: 120px; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; transition: 0.5s; }
+        .options { display: flex; flex-direction: column; gap: 15px; }
+        button { background: transparent; color: #888; border: 1px solid #333; padding: 12px; cursor: pointer; text-align: left; transition: 0.3s; font-size: 0.9rem; }
+        button:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
+        .money-counter { position: fixed; top: 20px; right: 20px; font-family: monospace; color: #f00; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
-    <div class="scanner-line" id="scanner"></div>
+    <div class="money-counter">賠償預估: $<span id="debt">0</span></div>
 
-    <div class="court-frame">
-        <h1>LUCA LAW</h1>
-        <div class="sub-title">OFFICIAL ADJUDICATION SYSTEM</div>
-        
-        <input type="text" id="case-input" placeholder="敘述你的冤情 (或遺言)..." autocomplete="off">
-        
-        <div id="result-display">準備審核證據...</div>
-        
-        <button id="judge-btn" onclick="judgeCase()">SUBMIT FOR JUDGMENT</button>
-    </div>
-
-    <div class="fee-meter">
-        ACCOUNTING: $<span id="money">0.00</span><br>
-        STATUS: <span id="status" style="color: #0f0;">ACTIVE</span>
+    <div class="office">
+        <div class="luca-portrait">CASE FILE: #2026-UNKNOWN-SUBJECT</div>
+        <div id="dialogue">（你推開了辦公室厚重的木門，盧卡在黑暗中抬起頭...）<br><br>「當事人，雖然我按秒計費，但你的愚蠢程度顯然連這幾秒都不值得。說吧，你又惹了什麼麻煩？」</div>
+        <div class="options" id="options-alt">
+            <button onclick="nextStep('fight')">「我不小心揍了我的上司...」</button>
+            <button onclick="nextStep('scam')">「我好像被網路上的帥哥/美女詐騙了...」</button>
+            <button onclick="nextStep('bored')">「我只是想找你聊天。」</button>
+        </div>
     </div>
 
     <script>
-        const lucaQuotes = [
-            "當事人，這不是案件，這只是單純的智力障礙。",
-            "敗訴率 99.9%。剩下的 0.1% 是法官那天可能也瘋了。",
-            "法律不保護躺在權利上睡覺的人，尤其是睡得跟你一樣死的人。",
-            "建議你把律師費留著去買點好吃的，這是你最後的寬裕。",
-            "證據不足？不，是你大腦的邏輯迴路不足。",
-            "我按秒計費。而你剛剛這句話浪費了我價值兩台法拉利的時間。",
-            "這種案子去法院，連門口的保全都會笑出聲。",
-            "你的辯詞就像漏水的篩子，沒一個地方能站得住腳。",
-            "直接自首吧，至少還能省下我的諮詢費。"
-        ];
+        let debt = 0;
+        const diag = document.getElementById('dialogue');
+        const opt = document.getElementById('options-alt');
 
-        // 自動計費器
-        let cash = 0;
-        setInterval(() => {
-            cash += Math.random() * 80;
-            document.getElementById('money').innerText = cash.toFixed(2);
-        }, 1200);
+        const script = {
+            fight: {
+                text: "「揍了上司？呵，雖然我很欣賞你的勇氣，但法律只看證據。你那是蓄意傷害，還是你只是想測試對方的臉皮厚度？」",
+                options: [
+                    { t: "「是他先羞辱我的！」", next: "fight_lose" },
+                    { t: "「我當時手滑了。」", next: "fight_prison" }
+                ],
+                fine: 50000
+            },
+            scam: {
+                text: "「被詐騙？這種二十世紀的當受騙方式竟然還能在你身上發生。看來你的大腦還停留在撥接時代。錢轉出去了嗎？」",
+                options: [
+                    { t: "「全轉了，連學費都在裡面。」", next: "scam_broke" },
+                    { t: "「還好，只轉了三萬塊。」", next: "scam_lucky" }
+                ],
+                fine: 30000
+            },
+            bored: {
+                text: "「聊天？當事人，你是覺得我的諮詢費太便宜，還是你的時間真的多到可以隨便揮霍？滾出去，或是現在付我五萬美金。」",
+                options: [
+                    { t: "「對不起，我這就滾。」", next: "end_run" },
+                    { t: "「（遞出支票）這是一百萬。」", next: "end_rich" }
+                ],
+                fine: 50000
+            },
+            fight_lose: { text: "「羞辱？那叫職場指導。當事人，你準備好賠償對方的醫療費加上精神損失了嗎？我建議你直接把房子過戶給他。」", options: [], fine: 2000000 },
+            fight_prison: { text: "「手滑？這個理由去跟監獄裡的獄友說吧，他們會很喜歡你這種幽默感的。」", options: [], fine: 0 },
+            scam_broke: { text: "「很好，現在你唯一的價值就是作為『愚蠢案例』被寫進法律教科書。出去，別把窮酸氣帶進我的辦公室。」", options: [], fine: 9999999 },
+            end_rich: { text: "「（收下支票）...突然覺得你的邏輯也不是那麼不可救藥。坐下，我們從這場官司的『無罪化』開始聊起。」", options: [], fine: -1000000 }
+        };
 
-        function judgeCase() {
-            const input = document.getElementById('case-input');
-            const result = document.getElementById('result-display');
-            const scanner = document.getElementById('scanner');
-            const btn = document.getElementById('judge-btn');
+        function nextStep(stepId) {
+            const node = script[stepId];
+            if(!node) return;
 
-            if (!input.value.trim()) {
-                result.innerText = "請輸入內容，別讓我對著空氣開庭。";
-                return;
-            }
+            debt += node.fine || 0;
+            document.getElementById('debt').innerText = debt.toLocaleString();
 
-            // 啟動視覺特效
-            btn.disabled = true;
-            result.innerText = "掃描邏輯缺陷中...";
-            result.style.color = "#444";
-            scanner.style.display = "block";
-            scanner.style.animation = "scanAnim 2s infinite";
-
-            // 兩秒後給出殘酷審判
+            diag.style.opacity = 0;
             setTimeout(() => {
-                scanner.style.display = "none";
-                result.style.color = "#ff3b3b";
-                result.innerText = lucaQuotes[Math.floor(Math.random() * lucaQuotes.length)];
-                input.value = "";
-                btn.disabled = false;
-            }, 2500);
+                diag.innerHTML = node.text;
+                diag.style.opacity = 1;
+                
+                opt.innerHTML = "";
+                if(node.options && node.options.length > 0) {
+                    node.options.forEach(o => {
+                        const b = document.createElement('button');
+                        b.innerText = o.t;
+                        b.onclick = () => nextStep(o.next);
+                        opt.appendChild(b);
+                    });
+                } else {
+                    const r = document.createElement('button');
+                    r.innerText = "結局：接受審判 (重新開始)";
+                    r.onclick = () => location.reload();
+                    opt.appendChild(r);
+                }
+            }, 3000); // 延遲 300 毫秒增加儀式感
         }
     </script>
 </body>

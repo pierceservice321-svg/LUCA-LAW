@@ -3,79 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚖️ LUCA // FINAL VERDICT</title>
+    <title>⚖️ LUCA // 敗訴判定所</title>
     <style>
-        :root { --bg: #000; --text: #fff; --border: #333; }
-        body { background: var(--bg); color: var(--text); font-family: 'PingFang TC', 'Microsoft JhengHei', monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .court-container { width: 95%; max-width: 500px; border: 1px solid var(--border); background: var(--bg); box-shadow: 0 0 40px rgba(255,255,255,0.1); border-radius: 8px; overflow: hidden; }
-        #chat-box { height: 450px; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 20px; border-bottom: 1px solid var(--border); }
-        .msg { max-width: 85%; font-size: 0.95rem; line-height: 1.6; }
-        .luca-msg { align-self: flex-start; border-left: 3px solid #fff; padding-left: 15px; color: #eee; }
-        .user-msg { align-self: flex-end; background: #fff; color: #000; padding: 10px 18px; font-weight: bold; border-radius: 20px 20px 0 20px; }
-        .input-area { display: flex; padding: 20px; background: #0a0a0a; gap: 12px; }
-        input { flex: 1; padding: 12px; background: #1a1a1a; border: 1px solid #444; color: #fff; outline: none; border-radius: 4px; }
-        button { background: #fff; color: #000; border: none; padding: 0 25px; cursor: pointer; font-weight: bold; border-radius: 4px; }
-        .loading { font-size: 0.8rem; color: #666; text-align: center; padding: 10px; display: none; }
+        :root { --main-red: #ff3b3b; --bg-black: #050505; }
+        body { background: var(--bg-black); color: #fff; font-family: 'Times New Roman', 'PingFang TC', serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
+        
+        /* 掃描線動畫 */
+        .scanner-line { width: 100%; height: 3px; background: var(--main-red); position: fixed; top: -10px; left: 0; z-index: 100; box-shadow: 0 0 15px var(--main-red); display: none; }
+        @keyframes scanAnim { 0% { top: 0%; } 100% { top: 100%; } }
+
+        .court-frame { width: 420px; border: 1px solid #222; padding: 50px; text-align: center; background: rgba(0,0,0,0.8); position: relative; box-shadow: 0 0 50px rgba(0,0,0,1); }
+        h1 { letter-spacing: 8px; font-weight: 100; color: #fff; margin-bottom: 5px; font-size: 1.8rem; }
+        .sub-title { font-size: 0.6rem; color: #444; letter-spacing: 3px; margin-bottom: 40px; }
+
+        #result-display { height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--main-red); line-height: 1.6; margin: 20px 0; border: 1px solid #111; padding: 15px; }
+        
+        input { width: 100%; padding: 12px; background: transparent; border: none; border-bottom: 1px solid #333; color: #fff; text-align: center; outline: none; font-size: 1rem; transition: 0.3s; }
+        input:focus { border-bottom: 1px solid #fff; }
+
+        button { margin-top: 30px; background: transparent; color: #fff; border: 1px solid #fff; padding: 12px 40px; cursor: pointer; font-size: 0.8rem; letter-spacing: 2px; transition: 0.4s; }
+        button:hover { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+
+        .fee-meter { position: fixed; bottom: 30px; left: 30px; font-family: monospace; color: #222; font-size: 0.8rem; }
+        #money { color: #444; }
     </style>
 </head>
 <body>
-    <div class="court-container">
-        <div id="chat-box"></div>
-        <div id="loading" class="loading">正在審核當事人的邏輯...</div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="說點有法律效力的話..." autocomplete="off">
-            <button onclick="askAI()">SEND</button>
-        </div>
+
+    <div class="scanner-line" id="scanner"></div>
+
+    <div class="court-frame">
+        <h1>LUCA LAW</h1>
+        <div class="sub-title">OFFICIAL ADJUDICATION SYSTEM</div>
+        
+        <input type="text" id="case-input" placeholder="敘述你的冤情 (或遺言)..." autocomplete="off">
+        
+        <div id="result-display">準備審核證據...</div>
+        
+        <button id="judge-btn" onclick="judgeCase()">SUBMIT FOR JUDGMENT</button>
+    </div>
+
+    <div class="fee-meter">
+        ACCOUNTING: $<span id="money">0.00</span><br>
+        STATUS: <span id="status" style="color: #0f0;">ACTIVE</span>
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyBCa79YloJmE_nyas6TsIGJ8XJSAmHAbOA';
+        const lucaQuotes = [
+            "當事人，這不是案件，這只是單純的智力障礙。",
+            "敗訴率 99.9%。剩下的 0.1% 是法官那天可能也瘋了。",
+            "法律不保護躺在權利上睡覺的人，尤其是睡得跟你一樣死的人。",
+            "建議你把律師費留著去買點好吃的，這是你最後的寬裕。",
+            "證據不足？不，是你大腦的邏輯迴路不足。",
+            "我按秒計費。而你剛剛這句話浪費了我價值兩台法拉利的時間。",
+            "這種案子去法院，連門口的保全都會笑出聲。",
+            "你的辯詞就像漏水的篩子，沒一個地方能站得住腳。",
+            "直接自首吧，至少還能省下我的諮詢費。"
+        ];
 
-        window.onload = () => { addMessage("當事人，連線路徑已重新校準。如果你現在還不跟我說話，我會控告你藐視法庭。", 'luca-msg'); };
+        // 自動計費器
+        let cash = 0;
+        setInterval(() => {
+            cash += Math.random() * 80;
+            document.getElementById('money').innerText = cash.toFixed(2);
+        }, 1200);
 
-        async function askAI() {
-            const input = document.getElementById('user-input');
-            const text = input.value.trim();
-            if (!text) return;
+        function judgeCase() {
+            const input = document.getElementById('case-input');
+            const result = document.getElementById('result-display');
+            const scanner = document.getElementById('scanner');
+            const btn = document.getElementById('judge-btn');
 
-            addMessage(text, 'user-msg');
-            input.value = '';
-            document.getElementById('loading').style.display = 'block';
-
-            try {
-                // 這是 2026 年最核心的正確路徑：v1 版本搭配 gemini-1.5-flash-latest
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: "你現在是毒舌冷酷的精英律師盧卡(Luca)，請稱呼對方為當事人，並用極度高傲、尖酸刻薄的口氣回覆這段話，嚴禁使用括號描述動作：" + text }] }]
-                    })
-                });
-
-                const data = await res.json();
-                document.getElementById('loading').style.display = 'none';
-
-                if (data.error) {
-                    addMessage("(診斷報告: " + data.error.message + ")", "luca-msg");
-                } else {
-                    const reply = data.candidates[0].content.parts[0].text;
-                    addMessage(reply, 'luca-msg');
-                }
-            } catch (e) {
-                document.getElementById('loading').style.display = 'none';
-                addMessage("(連線中斷) 你的環境防火牆太厚了，盧卡進不去。", "luca-msg");
+            if (!input.value.trim()) {
+                result.innerText = "請輸入內容，別讓我對著空氣開庭。";
+                return;
             }
-        }
 
-        function addMessage(t, c) {
-            const d = document.createElement('div');
-            d.className = `msg ${c}`;
-            d.innerHTML = c === 'luca-msg' ? `<b>[LUCA]</b><br>${t}` : t;
-            document.getElementById('chat-box').appendChild(d);
-            document.getElementById('chat-box').scrollTop = document.getElementById('chat-box').scrollHeight;
-        }
+            // 啟動視覺特效
+            btn.disabled = true;
+            result.innerText = "掃描邏輯缺陷中...";
+            result.style.color = "#444";
+            scanner.style.display = "block";
+            scanner.style.animation = "scanAnim 2s infinite";
 
-        document.getElementById('user-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') askAI(); });
+            // 兩秒後給出殘酷審判
+            setTimeout(() => {
+                scanner.style.display = "none";
+                result.style.color = "#ff3b3b";
+                result.innerText = lucaQuotes[Math.floor(Math.random() * lucaQuotes.length)];
+                input.value = "";
+                btn.disabled = false;
+            }, 2500);
+        }
     </script>
 </body>
 </html>

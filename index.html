@@ -1,1 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚖️ 盧卡律師的辯論法庭</title>
+    <style>
+        body { background-color: #0a0a0a; color: #d4d4d4; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .court-container { width: 95%; max-width: 550px; background: #151515; border: 2px solid #b8860b; border-radius: 8px; box-shadow: 0 0 30px rgba(0,0,0,0.8); overflow: hidden; }
+        .header { background: #b8860b; color: #000; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2rem; letter-spacing: 3px; }
+        #chat-box { height: 450px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; background-image: linear-gradient(rgba(20,20,20,0.9), rgba(20,20,20,0.9)), url('https://www.transparenttextures.com/patterns/dark-leather.png'); }
+        .msg { max-width: 80%; padding: 12px 16px; border-radius: 4px; line-height: 1.6; font-size: 0.95rem; position: relative; }
+        .luca-msg { align-self: flex-start; background-color: #252525; border-left: 5px solid #ff4500; color: #eee; }
+        .luca-msg::before { content: "LUCA"; display: block; font-size: 0.7rem; color: #b8860b; margin-bottom: 5px; font-weight: bold; }
+        .user-msg { align-self: flex-end; background-color: #b8860b; color: #000; font-weight: 600; text-align: right; }
+        .input-area { display: flex; padding: 15px; background: #222; border-top: 1px solid #333; }
+        input { flex: 1; padding: 12px; border: 1px solid #444; background: #000; color: #fff; outline: none; border-radius: 4px 0 0 4px; }
+        button { background: #b8860b; color: #000; border: none; padding: 0 25px; font-weight: bold; cursor: pointer; border-radius: 0 4px 4px 0; transition: 0.2s; }
+        button:hover { background: #daa520; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body>
 
+    <div class="court-container">
+        <div class="header">COURT IN SESSION</div>
+        <div id="chat-box">
+            <div class="msg luca-msg">（盧卡優雅地翻開卷宗，目光凌厲地掃過來）<br>坐下，當事人。在我的法庭裡，只有證據和邏輯能活下來。你想挑戰哪條罪名？</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="對盧卡律師提出反駁..." onkeypress="if(event.keyCode==13) sendMessage()">
+            <button onclick="sendMessage()">抗議</button>
+        </div>
+    </div>
+
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+
+        function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user-msg');
+            userInput.value = '';
+
+            // 盧卡反應時間
+            setTimeout(() => {
+                const response = lucaPersona(text);
+                addMessage(response, 'luca-msg');
+            }, 700);
+        }
+
+        function addMessage(text, className) {
+            const div = document.createElement('div');
+            div.className = `msg ${className}`;
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function lucaPersona(input) {
+            // 邏輯關鍵字判斷
+            if (input.includes("對不起") || input.includes("錯了") || input.includes("嗚")) {
+                return "現在才求饒？太晚了，**失敗者**。法官不會同情你的眼淚，我也一樣。";
+            }
+            if (input.includes("抗議") || input.includes("不對") || input.includes("才不是")) {
+                return "抗議無效！你的情緒化發言只會讓你顯得更無能，**挑戰者**。拿出證據來！";
+            }
+            if (input.includes("證據") || input.includes("法條")) {
+                return "（冷笑一聲）法律條文？那些東西是我用來操縱勝負的工具。你覺得你贏得了我嗎，**挑戰者**？";
+            }
+            if (input.includes("愛") || input.includes("喜歡") || input.includes("嫁")) {
+                return "咳……（敲木槌）肅靜！**當事人**，試圖在法庭上誘惑律師，這也是你的策略之一嗎？";
+            }
+            if (input.length > 15) {
+                return "話說得真多，**當事人**。但遺憾的是，廢話的體積並不等於邏輯的重量。";
+            }
+
+            // 隨機回覆
+            const pool = [
+                "看著我的眼睛，**當事人**。你覺得你有勝算嗎？",
+                "如果你只有這種程度，我建議你還是直接認罪吧，**失敗者**。",
+                "這就是你的反駁？簡直像一張一撕就破的廢紙，**挑戰者**。",
+                "喔？有點意思。但這還不足以推翻我的論點，**當事人**。",
+                "（合上卷宗）你的辯論到此結束了嗎？我還以為你能多讓我興奮一點呢，**挑戰者**。"
+            ];
+            return pool[Math.floor(Math.random() * pool.length)];
+        }
+    </script>
+</body>
+</html>

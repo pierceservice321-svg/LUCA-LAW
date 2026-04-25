@@ -4,93 +4,102 @@
     <meta charset="UTF-8">
     <title>⚖️ LUCA // 靈魂審訊室</title>
     <style>
-        body { background: #000; color: #fff; font-family: 'PingFang TC', serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .office { width: 90%; max-width: 500px; border: 1px solid #222; padding: 40px; background: linear-gradient(145deg, #0a0a0a, #000); box-shadow: 0 0 50px rgba(0,0,0,1); }
-        .luca-portrait { font-size: 0.7rem; color: #333; margin-bottom: 20px; border-bottom: 1px solid #111; padding-bottom: 10px; }
-        #dialogue { min-height: 120px; font-size: 1.1rem; line-height: 1.6; margin-bottom: 30px; transition: 0.5s; }
-        .options { display: flex; flex-direction: column; gap: 15px; }
-        button { background: transparent; color: #888; border: 1px solid #333; padding: 12px; cursor: pointer; text-align: left; transition: 0.3s; font-size: 0.9rem; }
-        button:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,0.05); }
-        .money-counter { position: fixed; top: 20px; right: 20px; font-family: monospace; color: #f00; font-size: 0.8rem; }
+        :root { --main-white: #ffffff; --dark-grey: #1a1a1a; }
+        body { background: #000; color: var(--main-white); font-family: 'PingFang TC', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .office { width: 90%; max-width: 500px; border: 1px solid #333; padding: 40px; background: #050505; position: relative; box-shadow: 0 0 60px rgba(0,0,0,1); }
+        .case-header { font-size: 0.7rem; color: #444; letter-spacing: 2px; border-bottom: 1px solid #222; margin-bottom: 30px; padding-bottom: 10px; }
+        #dialogue { min-height: 140px; font-size: 1.15rem; line-height: 1.7; margin-bottom: 40px; color: #ddd; }
+        .options-container { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn { background: transparent; color: #888; border: 1px solid #333; padding: 15px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 1rem; border-radius: 2px; display: flex; align-items: center; }
+        .option-btn:hover { border-color: var(--main-white); color: var(--main-white); background: rgba(255,255,255,0.05); }
+        .option-prefix { font-weight: bold; margin-right: 15px; color: #555; }
+        .debt-panel { position: fixed; top: 30px; left: 30px; font-family: monospace; }
+        .debt-label { font-size: 0.7rem; color: #444; }
+        .debt-value { color: #ff3b3b; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-    <div class="money-counter">賠償預估: $<span id="debt">0</span></div>
+    <div class="debt-panel">
+        <div class="debt-label">ESTIMATED DAMAGES</div>
+        <div class="debt-value">$<span id="debt">0</span></div>
+    </div>
 
     <div class="office">
-        <div class="luca-portrait">CASE FILE: #2026-UNKNOWN-SUBJECT</div>
-        <div id="dialogue">（你推開了辦公室厚重的木門，盧卡在黑暗中抬起頭...）<br><br>「當事人，雖然我按秒計費，但你的愚蠢程度顯然連這幾秒都不值得。說吧，你又惹了什麼麻煩？」</div>
-        <div class="options" id="options-alt">
-            <button onclick="nextStep('fight')">「我不小心揍了我的上司...」</button>
-            <button onclick="nextStep('scam')">「我好像被網路上的帥哥/美女詐騙了...」</button>
-            <button onclick="nextStep('bored')">「我只是想找你聊天。」</button>
+        <div class="case-header">FILE ID: #2026-LUCA-OFFICE</div>
+        <div id="dialogue">（盧卡合上手中的卷宗，冷冷地看著你）<br><br>「當事人，雖然我按秒計費，但你的愚蠢程度顯然連這幾秒都不值得。說吧，你又惹了什麼麻煩？」</div>
+        <div class="options-container" id="options-box">
+            <button class="option-btn" onclick="nextStep('fight')"><span class="option-prefix">A.</span> 「我不小心揍了我的上司...」</button>
+            <button class="option-btn" onclick="nextStep('scam')"><span class="option-prefix">B.</span> 「我好像被網路詐騙了，錢全沒了。」</button>
+            <button class="option-btn" onclick="nextStep('bored')"><span class="option-prefix">C.</span> 「沒事，我只是想找你聊天。」</button>
         </div>
     </div>
 
     <script>
-        let debt = 0;
-        const diag = document.getElementById('dialogue');
-        const opt = document.getElementById('options-alt');
+        let currentDebt = 0;
+        const diagElement = document.getElementById('dialogue');
+        const optContainer = document.getElementById('options-box');
 
-        const script = {
+        const scenario = {
             fight: {
                 text: "「揍了上司？呵，雖然我很欣賞你的勇氣，但法律只看證據。你那是蓄意傷害，還是你只是想測試對方的臉皮厚度？」",
                 options: [
-                    { t: "「是他先羞辱我的！」", next: "fight_lose" },
-                    { t: "「我當時手滑了。」", next: "fight_prison" }
+                    { prefix: "A", t: "「是他先羞辱我的人格！」", next: "fight_lose" },
+                    { prefix: "B", t: "「我當時手滑，沒控制住力道。」", next: "fight_prison" }
                 ],
                 fine: 50000
             },
             scam: {
-                text: "「被詐騙？這種二十世紀的當受騙方式竟然還能在你身上發生。看來你的大腦還停留在撥接時代。錢轉出去了嗎？」",
+                text: "「被詐騙？這種二十世紀的受騙方式竟然還能在你身上發生。看來你的大腦還停留在撥接時代。錢轉出去了嗎？」",
                 options: [
-                    { t: "「全轉了，連學費都在裡面。」", next: "scam_broke" },
-                    { t: "「還好，只轉了三萬塊。」", next: "scam_lucky" }
+                    { prefix: "A", t: "「全轉了，連下個月房租都在裡面。」", next: "scam_broke" },
+                    { prefix: "B", t: "「還好，我及時發現只損失了三萬。」", next: "scam_lucky" }
                 ],
                 fine: 30000
             },
             bored: {
-                text: "「聊天？當事人，你是覺得我的諮詢費太便宜，還是你的時間真的多到可以隨便揮霍？滾出去，或是現在付我五萬美金。」",
+                text: "「聊天？當事人，你是覺得我的諮詢費太便宜，還是你的時間多到可以隨便揮霍？出去，或是現在付我五萬美金。」",
                 options: [
-                    { t: "「對不起，我這就滾。」", next: "end_run" },
-                    { t: "「（遞出支票）這是一百萬。」", next: "end_rich" }
+                    { prefix: "A", t: "「對不起，我這就滾出辦公室。」", next: "end_run" },
+                    { prefix: "B", t: "「（遞出支票）這是一百萬，請陪我聊。」", next: "end_rich" }
                 ],
                 fine: 50000
             },
-            fight_lose: { text: "「羞辱？那叫職場指導。當事人，你準備好賠償對方的醫療費加上精神損失了嗎？我建議你直接把房子過戶給他。」", options: [], fine: 2000000 },
-            fight_prison: { text: "「手滑？這個理由去跟監獄裡的獄友說吧，他們會很喜歡你這種幽默感的。」", options: [], fine: 0 },
-            scam_broke: { text: "「很好，現在你唯一的價值就是作為『愚蠢案例』被寫進法律教科書。出去，別把窮酸氣帶進我的辦公室。」", options: [], fine: 9999999 },
-            end_rich: { text: "「（收下支票）...突然覺得你的邏輯也不是那麼不可救藥。坐下，我們從這場官司的『無罪化』開始聊起。」", options: [], fine: -1000000 }
+            fight_lose: { text: "「羞辱？那叫職場指導。當事人，你準備好賠償對方的醫療費加上精神損失了嗎？我建議你直接把房子過戶給他省事。」", options: [], fine: 2000000 },
+            fight_prison: { text: "「手滑？這個理由留著去跟監獄裡的獄友說吧，他們會很喜歡你這種幽默感的。尤其是當你幫他們撿肥皂的時候。」", options: [], fine: 0 },
+            scam_broke: { text: "「很好，現在你唯一的價值就是作為『愚蠢案例』被寫進法律教科書。出去，別把窮酸氣帶進我的辦公室。」", options: [], fine: 999999 },
+            scam_lucky: { text: "「三萬塊買個教訓，看來你的智商也就值這個價。下次再被騙，記得別來找我，直接去警察局門口哭比較快。」", options: [], fine: 10000 },
+            end_run: { text: "（你灰溜溜地逃出了辦公室，背後傳來盧卡一聲冷哼。）", options: [], fine: 0 },
+            end_rich: { text: "「（收下支票）...突然覺得你的邏輯也不是那麼不可救藥。坐下，我們從這場對話的『無罪化』開始聊起。」", options: [], fine: -1000000 }
         };
 
-        function nextStep(stepId) {
-            const node = script[stepId];
+        function nextStep(id) {
+            const node = scenario[id];
             if(!node) return;
 
-            debt += node.fine || 0;
-            document.getElementById('debt').innerText = debt.toLocaleString();
+            // 更新賠償金
+            currentDebt += node.fine || 0;
+            document.getElementById('debt').innerText = currentDebt.toLocaleString();
 
-            diag.style.opacity = 0;
-            setTimeout(() => {
-                diag.innerHTML = node.text;
-                diag.style.opacity = 1;
-                
-                opt.innerHTML = "";
-                if(node.options && node.options.length > 0) {
-                    node.options.forEach(o => {
-                        const b = document.createElement('button');
-                        b.innerText = o.t;
-                        b.onclick = () => nextStep(o.next);
-                        opt.appendChild(b);
-                    });
-                } else {
-                    const r = document.createElement('button');
-                    r.innerText = "結局：接受審判 (重新開始)";
-                    r.onclick = () => location.reload();
-                    opt.appendChild(r);
-                }
-            }, 3000); // 延遲 300 毫秒增加儀式感
+            // 更新對話與選項
+            diagElement.innerHTML = node.text;
+            optContainer.innerHTML = "";
+
+            if(node.options && node.options.length > 0) {
+                node.options.forEach(o => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerHTML = `<span class="option-prefix">${o.prefix}.</span> ${o.t}`;
+                    btn.onclick = () => nextStep(o.next);
+                    optContainer.appendChild(btn);
+                });
+            } else {
+                const restartBtn = document.createElement('button');
+                restartBtn.className = "option-btn";
+                restartBtn.innerHTML = `<span class="option-prefix">></span> 案件結束，接受審判 (重新開始)`;
+                restartBtn.onclick = () => location.reload();
+                optContainer.appendChild(restartBtn);
+            }
         }
     </script>
 </body>

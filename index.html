@@ -11,24 +11,27 @@
         @keyframes shake { 0% { transform: translate(3px, 3px); } 20% { transform: translate(-3px, -3px); } 40% { transform: translate(-3px, 3px); } 60% { transform: translate(3px, -3px); } 100% { transform: translate(0,0); } }
         .shake { animation: shake 0.25s ease-in-out; }
 
-        .court-container { width: 95%; max-width: 500px; border: 2px solid var(--border); background: var(--bg); position: relative; box-shadow: 0 0 30px rgba(255,255,255,0.05); }
+        .court-container { width: 95%; max-width: 500px; border: 2px solid var(--border); background: var(--bg); position: relative; box-shadow: 0 0 40px rgba(255,255,255,0.1); }
         
-        /* 加粗的耐心條 */
         .patience-container { padding: 15px; border-bottom: 2px solid var(--border); background: #080808; }
-        .patience-label { font-size: 10px; font-weight: bold; margin-bottom: 8px; letter-spacing: 2px; }
-        .patience-bar { height: 12px; background: #222; width: 100%; border: 1px solid #444; }
-        #patience-fill { height: 100%; background: #ffffff; width: 100%; transition: width 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+        .patience-label { font-size: 10px; font-weight: bold; margin-bottom: 8px; letter-spacing: 2px; color: #888; }
+        .patience-bar { height: 16px; background: #222; width: 100%; border: 1px solid #444; }
+        #patience-fill { height: 100%; background: #ffffff; width: 100%; transition: width 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
 
-        #chat-box { height: 400px; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 30px; }
+        #chat-box { height: 420px; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 30px; scroll-behavior: smooth; }
         
-        .msg { max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
-        .luca-msg { align-self: flex-start; border-left: 2px solid #fff; padding-left: 15px; }
-        .luca-name { font-weight: bold; margin-bottom: 10px; font-size: 0.8rem; color: #aaa; letter-spacing: 1px; }
-        .user-msg { align-self: flex-end; background: var(--user-bg); color: var(--user-text); padding: 10px 15px; font-weight: bold; }
+        .msg { max-width: 85%; font-size: 1rem; line-height: 1.6; opacity: 0; transform: translateY(10px); animation: fadeInUp 0.4s forwards; }
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+
+        .luca-msg { align-self: flex-start; border-left: 3px solid #fff; padding-left: 15px; }
+        .luca-name { font-weight: bold; margin-bottom: 10px; font-size: 0.85rem; color: #888; letter-spacing: 2px; }
+        .user-msg { align-self: flex-end; background: var(--user-bg); color: var(--user-text); padding: 12px 18px; font-weight: bold; }
+
+        .typing { font-style: italic; color: #555; font-size: 0.8rem; padding: 0 25px 15px; display: none; align-self: flex-start; }
 
         .input-area { display: flex; padding: 20px; border-top: 2px solid var(--border); background: #080808; }
         input { flex: 1; padding: 12px; border: none; background: #000; color: #fff; outline: none; font-size: 1rem; border-bottom: 1px solid #444; }
-        button { background: #fff; color: #000; border: none; padding: 0 20px; cursor: pointer; margin-left: 15px; font-weight: bold; font-size: 0.8rem; transition: 0.2s; }
+        button { background: #fff; color: #000; border: none; padding: 0 25px; cursor: pointer; margin-left: 15px; font-weight: bold; transition: 0.2s; }
         button:hover { background: #888; }
         ::-webkit-scrollbar { width: 3px; }
         ::-webkit-scrollbar-thumb { background: #555; }
@@ -38,31 +41,34 @@
 
     <div class="court-container" id="main-window">
         <div class="patience-container">
-            <div class="patience-label">PATIENCE METER</div>
+            <div class="patience-label">STATUS: LUCA'S PATIENCE</div>
             <div class="patience-bar"><div id="patience-fill"></div></div>
         </div>
         <div id="chat-box">
             <div class="msg luca-msg">
                 <div class="luca-name">LUCA</div>
-                <div class="luca-text">當事人，法律不保護躺在權利上睡覺的人，更不保護沒帶腦子的人。你想浪費我多少時間？</div>
+                <div class="luca-text">當事人，法律不保護躺在權利上睡覺的人。你想浪費我多少時間？</div>
             </div>
         </div>
+        <div id="typing-indicator" class="typing">LUCA is typing...</div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Enter your statement..." autocomplete="off" onkeypress="if(event.keyCode==13) sendMessage()">
+            <input type="text" id="user-input" placeholder="Type your defense..." autocomplete="off" onkeypress="if(event.keyCode==13) sendMessage()">
             <button onclick="sendMessage()">SUBMIT</button>
         </div>
     </div>
 
-    <audio id="sound-gavel" src="https://custom-notification-sounds.s3.amazonaws.com/Gavel-Knock.mp3"></audio>
-    <audio id="sound-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
-    <audio id="sound-end" src="https://assets.mixkit.co/active_storage/sfx/1074/1074-preview.mp3"></audio>
+    <audio id="sound-gavel" src="https://cdn.pixabay.com/audio/2022/03/10/audio_c3507e1554.mp3"></audio>
+    <audio id="sound-click" src="https://cdn.pixabay.com/audio/2022/03/15/audio_783861287b.mp3"></audio>
+    <audio id="sound-end" src="https://cdn.pixabay.com/audio/2021/08/04/audio_062402c385.mp3"></audio>
 
     <script>
         let patience = 100;
+        let lastResponse = ""; // 記憶上一句
         const chatBox = document.getElementById('chat-box');
         const userInput = document.getElementById('user-input');
         const patienceFill = document.getElementById('patience-fill');
         const mainWindow = document.getElementById('main-window');
+        const typingIndicator = document.getElementById('typing-indicator');
         
         const sndGavel = document.getElementById('sound-gavel');
         const sndClick = document.getElementById('sound-click');
@@ -78,11 +84,15 @@
             addMessage(text, 'user-msg');
             userInput.value = '';
 
+            typingIndicator.style.display = 'block';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
             setTimeout(() => {
+                typingIndicator.style.display = 'none';
                 const response = lucaPersona(text);
                 addMessage(response, 'luca-msg');
                 updatePatience(text);
-            }, 600);
+            }, 1200);
         }
 
         function addMessage(text, className) {
@@ -100,7 +110,7 @@
         function updatePatience(input) {
             let penalty = 5;
             if (input.length < 4) {
-                penalty = 20;
+                penalty = 25; // 短回覆扣更多
                 triggerPenalty();
             }
             
@@ -111,7 +121,7 @@
             if (patience <= 0) {
                 setTimeout(() => {
                     sndEnd.play();
-                    addMessage("諮詢到此結束。失敗者，以後別讓我再看到你的名字出現在案卷上。", 'luca-msg');
+                    addMessage("諮詢結束了。失敗者，離我的辦公室遠點。", 'luca-msg');
                 }, 800);
             }
         }
@@ -126,40 +136,55 @@
         function lucaPersona(input) {
             if (patience <= 0) return "...";
 
-            // 諮詢費邏輯
-            if (input.includes("法") || input.includes("律") || input.includes("諮詢") || input.includes("幫我") || input.includes("教我")) {
+            // 1. 優先判斷法律諮詢 (增加變化量)
+            if (input.includes("法") || input.includes("律") || input.includes("諮詢") || input.includes("問")) {
                 const price = Math.floor(Math.random() * 900000) + 100000;
-                return `想諮詢法律問題？可以，我的起跳價是每小時 ${price.toLocaleString()} 元。當事人，付不起錢的話就閉嘴。`;
+                const legalPool = [
+                    `想諮詢？可以，起跳價 ${price.toLocaleString()} 元。當事人，付不起就閉嘴。`,
+                    `我的法律建議很貴，每分鐘收費 ${price.toLocaleString()} 元。你確定要繼續浪費錢？`,
+                    `談錢傷感情，但不談錢我根本懶得理你。諮詢費先付個 ${price.toLocaleString()} 元再說。`,
+                    `這張嘴開口一次就是 ${price.toLocaleString()} 元。你有帶支票簿嗎，當事人？`
+                ];
+                return legalPool[Math.floor(Math.random() * legalPool.length)];
             }
 
-            // 關鍵字反應
-            if (input.includes("對不起") || input.includes("錯了") || input.includes("嗚")) {
-                return "道歉是廉價的，而我的時間很貴。如果你只能表現出這種軟弱，那就趁早認罪，失敗者。";
-            }
-            if (input.includes("愛") || input.includes("喜歡") || input.includes("帥")) {
-                return "當事人，收起你那無聊的情感投射。如果你覺得靠這張嘴就能贏得官司，那你真的病得不輕。";
-            }
-            if (input.includes("輸") || input.includes("贏")) {
-                return "在我這裡，輸贏不是重點，重點是誰能活到最後。很顯然，那個人不會是你，挑戰者。";
-            }
-            if (input.length < 4) {
-                return "這種連標點符號都算不上的回覆，就是你對這場辯論的態度？";
+            // 2. 判斷負面情緒
+            if (input.includes("對不起") || input.includes("錯了") || input.includes("嗚") || input.includes("哭")) {
+                return "道歉是失敗者的專利。當事人，如果你不能展現價值，就滾出我的視線。";
             }
 
-            // 擴充回覆池
-            const pool = [
+            // 3. 判斷情感
+            if (input.includes("愛") || input.includes("喜歡") || input.includes("帥") || input.includes("抱")) {
+                return "收起你那無聊的情感投射。如果你覺得這能贏官司，那你真的病得不輕。";
+            }
+
+            // 4. 隨機毒舌池 (大幅增加內容防止重複)
+            const genericPool = [
                 "你的邏輯漏洞大到可以讓一輛卡車開過去。挑戰者，這就是你的極限了？",
-                "我現在開始懷疑，你的腦袋裡裝的是不是過期的影印紙。當事人，清醒點。",
-                "雖然聽你說話很痛苦，但我更心疼我的執業執照。失敗者，說點有意義的。",
-                "你說話的語氣讓我想起我那台壞掉的碎紙機。當事人，你能講重點嗎？",
-                "這是我今年聽過最滑稽的辯護詞。你是在參加喜劇比賽還是法庭辯論？",
+                "我開始懷疑，你的腦袋裡裝的是不是過期的影印紙。當事人，清醒點。",
+                "說話的語氣讓我想起我那台壞掉的碎紙機。你能講點重點嗎？",
                 "挑戰者，如果你想贏，至少表現得像個有智商的生物。下一句。",
-                "（敲桌子）當事人，我建議你重新讀一遍小學，再來跟我討論法律邏輯。",
-                "所以？這就是你全部的遺言了？我聽得快要失去耐心了。",
-                "你的每一句話都在降低這間辦公室的平均智商。失敗者，閉嘴或是說點正經的。",
-                "如果你只有這點能耐，我建議你直接把手伸出來等手銬。當事人。"
+                "這是我今年聽過最滑稽的辯護詞。你是在參加喜劇比賽嗎？",
+                "當事人，我建議你重新讀一遍小學，再來跟我討論邏輯問題。",
+                "你的每一句話都在降低這間辦公室的平均智商。失敗者，說點正經的。",
+                "如果你只有這點能耐，我建議你直接把手伸出來等手銬。當事人。",
+                "所以？這就是你思考了很久的結果？我聽得快睡著了。",
+                "當事人，你確定你不需要換個律師嗎？雖然我也很同情你的智力。",
+                "這種程度的發言，你居然有臉站在我面前。挑戰者，誰給你的勇氣？",
+                "別白費力氣了。在我的法庭裡，你這種邏輯活不過三秒。",
+                "你的辯詞跟廢紙唯一的區別在於，廢紙還能拿來回收。",
+                "挑戰者，如果你打算繼續說夢話，我會直接把你踢出去。",
+                "（敲桌子）當事人，我現在的耐心比你的銀行存款還要少。"
             ];
-            return pool[Math.floor(Math.random() * pool.length)];
+
+            // 確保不重複邏輯
+            let selected;
+            do {
+                selected = genericPool[Math.floor(Math.random() * genericPool.length)];
+            } while (selected === lastResponse);
+            
+            lastResponse = selected;
+            return selected;
         }
     </script>
 </body>

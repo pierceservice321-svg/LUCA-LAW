@@ -5,52 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚖️ LUCA // LEGAL OFFICE</title>
     <style>
-        :root { --bg: #000000; --text: #ffffff; --luca-bg: #1a1a1a; --user-bg: #ffffff; --user-text: #000000; --border: #333333; }
+        :root { --bg: #000000; --text: #ffffff; --luca-bg: #111111; --user-bg: #ffffff; --user-text: #000000; --border: #444444; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
         
-        @keyframes shake { 0% { transform: translate(2px, 2px); } 20% { transform: translate(-2px, -2px); } 40% { transform: translate(-2px, 2px); } 60% { transform: translate(2px, -2px); } 100% { transform: translate(0,0); } }
-        .shake { animation: shake 0.2s ease-in-out; }
+        @keyframes shake { 0% { transform: translate(3px, 3px); } 20% { transform: translate(-3px, -3px); } 40% { transform: translate(-3px, 3px); } 60% { transform: translate(3px, -3px); } 100% { transform: translate(0,0); } }
+        .shake { animation: shake 0.25s ease-in-out; }
 
-        .court-container { width: 95%; max-width: 500px; border: 1px solid var(--border); background: var(--bg); position: relative; }
+        .court-container { width: 95%; max-width: 500px; border: 2px solid var(--border); background: var(--bg); position: relative; box-shadow: 0 0 30px rgba(255,255,255,0.05); }
         
-        .patience-container { padding: 8px 15px; border-bottom: 1px solid var(--border); }
-        .patience-bar { height: 2px; background: #222; width: 100%; }
-        #patience-fill { height: 100%; background: #fff; width: 100%; transition: width 0.4s; }
+        /* 加粗的耐心條 */
+        .patience-container { padding: 15px; border-bottom: 2px solid var(--border); background: #080808; }
+        .patience-label { font-size: 10px; font-weight: bold; margin-bottom: 8px; letter-spacing: 2px; }
+        .patience-bar { height: 12px; background: #222; width: 100%; border: 1px solid #444; }
+        #patience-fill { height: 100%; background: #ffffff; width: 100%; transition: width 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
 
-        #chat-box { height: 450px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 25px; }
+        #chat-box { height: 400px; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 30px; }
         
-        .msg { max-width: 85%; font-size: 0.9rem; letter-spacing: 0.5px; }
-        .luca-msg { align-self: flex-start; border-left: 1px solid #fff; padding-left: 12px; }
-        .luca-name { font-weight: bold; margin-bottom: 8px; font-size: 0.75rem; color: #888; }
-        .user-msg { align-self: flex-end; background: var(--user-bg); color: var(--user-text); padding: 8px 12px; }
+        .msg { max-width: 85%; font-size: 0.95rem; line-height: 1.5; }
+        .luca-msg { align-self: flex-start; border-left: 2px solid #fff; padding-left: 15px; }
+        .luca-name { font-weight: bold; margin-bottom: 10px; font-size: 0.8rem; color: #aaa; letter-spacing: 1px; }
+        .user-msg { align-self: flex-end; background: var(--user-bg); color: var(--user-text); padding: 10px 15px; font-weight: bold; }
 
-        .input-area { display: flex; padding: 15px; border-top: 1px solid var(--border); }
-        input { flex: 1; padding: 10px; border: none; background: #000; color: #fff; outline: none; font-size: 0.9rem; border-bottom: 1px solid #333; }
-        button { background: none; color: #fff; border: 1px solid #fff; padding: 0 15px; cursor: pointer; margin-left: 10px; font-size: 0.8rem; }
-        button:hover { background: #fff; color: #000; }
-        ::-webkit-scrollbar { width: 2px; }
-        ::-webkit-scrollbar-thumb { background: #444; }
+        .input-area { display: flex; padding: 20px; border-top: 2px solid var(--border); background: #080808; }
+        input { flex: 1; padding: 12px; border: none; background: #000; color: #fff; outline: none; font-size: 1rem; border-bottom: 1px solid #444; }
+        button { background: #fff; color: #000; border: none; padding: 0 20px; cursor: pointer; margin-left: 15px; font-weight: bold; font-size: 0.8rem; transition: 0.2s; }
+        button:hover { background: #888; }
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-thumb { background: #555; }
     </style>
 </head>
 <body>
 
     <div class="court-container" id="main-window">
         <div class="patience-container">
+            <div class="patience-label">PATIENCE METER</div>
             <div class="patience-bar"><div id="patience-fill"></div></div>
         </div>
         <div id="chat-box">
             <div class="msg luca-msg">
                 <div class="luca-name">LUCA</div>
-                <div class="luca-text">當事人，如果你想在那張椅子上坐久一點，我建議你開口前先動動腦子。你想聊哪一宗案子？</div>
+                <div class="luca-text">當事人，法律不保護躺在權利上睡覺的人，更不保護沒帶腦子的人。你想浪費我多少時間？</div>
             </div>
         </div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your defense..." autocomplete="off" onkeypress="if(event.keyCode==13) sendMessage()">
+            <input type="text" id="user-input" placeholder="Enter your statement..." autocomplete="off" onkeypress="if(event.keyCode==13) sendMessage()">
             <button onclick="sendMessage()">SUBMIT</button>
         </div>
     </div>
 
-    <audio id="gavel-sound" src="https://assets.mixkit.co/active_storage/sfx/2034/2034-preview.mp3"></audio>
+    <audio id="sound-gavel" src="https://custom-notification-sounds.s3.amazonaws.com/Gavel-Knock.mp3"></audio>
+    <audio id="sound-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"></audio>
+    <audio id="sound-end" src="https://assets.mixkit.co/active_storage/sfx/1074/1074-preview.mp3"></audio>
 
     <script>
         let patience = 100;
@@ -58,11 +63,17 @@
         const userInput = document.getElementById('user-input');
         const patienceFill = document.getElementById('patience-fill');
         const mainWindow = document.getElementById('main-window');
-        const gavel = document.getElementById('gavel-sound');
+        
+        const sndGavel = document.getElementById('sound-gavel');
+        const sndClick = document.getElementById('sound-click');
+        const sndEnd = document.getElementById('sound-end');
 
         function sendMessage() {
             const text = userInput.value.trim();
             if (!text || patience <= 0) return;
+
+            sndClick.currentTime = 0;
+            sndClick.play();
 
             addMessage(text, 'user-msg');
             userInput.value = '';
@@ -71,7 +82,7 @@
                 const response = lucaPersona(text);
                 addMessage(response, 'luca-msg');
                 updatePatience(text);
-            }, 500);
+            }, 600);
         }
 
         function addMessage(text, className) {
@@ -87,54 +98,68 @@
         }
 
         function updatePatience(input) {
-            if (input.length < 5) {
-                patience -= 20;
+            let penalty = 5;
+            if (input.length < 4) {
+                penalty = 20;
                 triggerPenalty();
-            } else {
-                patience -= 5;
             }
+            
+            patience -= penalty;
             patience = Math.max(0, patience);
             patienceFill.style.width = patience + '%';
 
             if (patience <= 0) {
                 setTimeout(() => {
-                    addMessage("我的時間很貴，不想再聽你這些毫無價值的辯詞。失敗者，離我的辦公室遠點。", 'luca-msg');
-                    gavel.play();
+                    sndEnd.play();
+                    addMessage("諮詢到此結束。失敗者，以後別讓我再看到你的名字出現在案卷上。", 'luca-msg');
                 }, 800);
             }
         }
 
         function triggerPenalty() {
             mainWindow.classList.add('shake');
-            gavel.currentTime = 0;
-            gavel.play();
-            setTimeout(() => mainWindow.classList.remove('shake'), 200);
+            sndGavel.currentTime = 0;
+            sndGavel.play();
+            setTimeout(() => mainWindow.classList.remove('shake'), 250);
         }
 
         function lucaPersona(input) {
             if (patience <= 0) return "...";
 
-            if (input.includes("對不起") || input.includes("錯了")) {
-                return "失敗者才需要道歉。當事人，如果你不能展現你的價值，現在就可以認罪了。";
-            }
-            if (input.includes("愛") || input.includes("喜歡")) {
-                return "如果你想在我的法庭玩戀愛遊戲，我建議你先去掛精神科。別浪費我的專業，當事人。";
-            }
-            if (input.includes("不對") || input.includes("不是")) {
-                return "你除了否定之外，還有什麼有建設性的話要說嗎？挑戰者，這種辯解連三歲小孩都騙不了。";
-            }
-            if (input.length < 5) {
-                return "這種簡短又沒意義的回覆，你是打算讓案子直接進墳墓嗎？";
+            // 諮詢費邏輯
+            if (input.includes("法") || input.includes("律") || input.includes("諮詢") || input.includes("幫我") || input.includes("教我")) {
+                const price = Math.floor(Math.random() * 900000) + 100000;
+                return `想諮詢法律問題？可以，我的起跳價是每小時 ${price.toLocaleString()} 元。當事人，付不起錢的話就閉嘴。`;
             }
 
-            const generic = [
-                "這種程度的邏輯，你居然有臉站在我面前。挑戰者，你的勇氣是哪裡來的？",
-                "我現在開始覺得，幫你辯護簡直是在浪費我的法律執照。當事人，認真點。",
-                "所以？這就是你全部的能耐了？我聽得快睡著了。",
-                "你的發言就像這間辦公室的空氣一樣，稀薄又沒存在感。挑戰者，下一句。",
-                "這是我聽過最無聊的自白。當事人，你確定你不需要換個律師嗎？"
+            // 關鍵字反應
+            if (input.includes("對不起") || input.includes("錯了") || input.includes("嗚")) {
+                return "道歉是廉價的，而我的時間很貴。如果你只能表現出這種軟弱，那就趁早認罪，失敗者。";
+            }
+            if (input.includes("愛") || input.includes("喜歡") || input.includes("帥")) {
+                return "當事人，收起你那無聊的情感投射。如果你覺得靠這張嘴就能贏得官司，那你真的病得不輕。";
+            }
+            if (input.includes("輸") || input.includes("贏")) {
+                return "在我這裡，輸贏不是重點，重點是誰能活到最後。很顯然，那個人不會是你，挑戰者。";
+            }
+            if (input.length < 4) {
+                return "這種連標點符號都算不上的回覆，就是你對這場辯論的態度？";
+            }
+
+            // 擴充回覆池
+            const pool = [
+                "你的邏輯漏洞大到可以讓一輛卡車開過去。挑戰者，這就是你的極限了？",
+                "我現在開始懷疑，你的腦袋裡裝的是不是過期的影印紙。當事人，清醒點。",
+                "雖然聽你說話很痛苦，但我更心疼我的執業執照。失敗者，說點有意義的。",
+                "你說話的語氣讓我想起我那台壞掉的碎紙機。當事人，你能講重點嗎？",
+                "這是我今年聽過最滑稽的辯護詞。你是在參加喜劇比賽還是法庭辯論？",
+                "挑戰者，如果你想贏，至少表現得像個有智商的生物。下一句。",
+                "（敲桌子）當事人，我建議你重新讀一遍小學，再來跟我討論法律邏輯。",
+                "所以？這就是你全部的遺言了？我聽得快要失去耐心了。",
+                "你的每一句話都在降低這間辦公室的平均智商。失敗者，閉嘴或是說點正經的。",
+                "如果你只有這點能耐，我建議你直接把手伸出來等手銬。當事人。"
             ];
-            return generic[Math.floor(Math.random() * generic.length)];
+            return pool[Math.floor(Math.random() * pool.length)];
         }
     </script>
 </body>

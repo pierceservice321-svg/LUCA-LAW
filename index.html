@@ -14,7 +14,7 @@
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        #poem-area { margin-top: 10vh; line-height: 4; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
+        #poem-area { margin-top: 5vh; line-height: 4; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
         .poem-line { min-height: 1.5em; margin-bottom: 10px; opacity: 0; transition: opacity 1s; font-size: 1.2rem; }
 
         .report-sheet { 
@@ -42,6 +42,7 @@
 <audio id="sfx-fire" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502552548303962192/Fire_Crackling_-_Sound_Effect_HQ.mp3?ex=6a00209b&is=69fecf1b&hm=765827b3afee9dde88274c1a4e489d8f32ead7f82f7737713c7a1d9cb1f7ff36&"></audio>
 <audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&"></audio>
 <audio id="sfx-footstep" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502551092221706310/Horror_Footsteps_Walking_Up_Stairs_Sound_Effect.mp3?ex=6a001f40&is=69fecdc0&hm=e484b58514f8ebb66cc15107c4f1d03a7cad16fddfb35a9cc21b2ed03a770673&"></audio>
+<audio id="sfx-page" src="https://www.soundjay.com/misc/sounds/paper-flip-1.mp3"></audio>
 
 <div id="name-gate">
     <div style="color: #666; letter-spacing: 10px; margin-bottom: 40px; font-size: 0.75rem;">AUTHENTICATION</div>
@@ -57,12 +58,12 @@
 <div class="report-sheet" id="doc">
     <h1>EXPERIMENTAL PATHOLOGY REPORT</h1>
     <div id="doc-content">
-        <p><strong>SUBJECT:</strong> LUCA / <strong>ID:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
+        <p><strong>SUBJECT:</strong> LUCA / <strong>BIRTH:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
         
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖，瞳孔放大。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背，在混濁的泥濘中反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救。</p>
-            <p>施暴者在過程中不斷重複「燒焦的孤兒」等字眼，並宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的玩偶 <strong>(DOLL)</strong>。</p>
+            <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖，瞳孔呈現持續性放大。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背，在混濁的泥濘中反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救，其意識已進入深層解離狀態。</p>
+            <p>施暴者在過程中不斷重複「燒焦的孤兒」等字眼，並宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的<strong>破布偶</strong>。</p>
         </div>
 
         <div class="section-box">
@@ -97,10 +98,13 @@
         const val = document.getElementById('user-name').value.trim();
         if(!val) return;
         playerName = val;
-        document.querySelectorAll('audio').forEach(a => { a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(()=>{}); });
+        
+        const rain = document.getElementById('sfx-rain');
+        rain.volume = 0.5;
+        rain.play().catch(()=>{});
+
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
-        document.getElementById('sfx-rain').volume = 0.5; document.getElementById('sfx-rain').play().catch(()=>{});
         startPoem();
     }
 
@@ -109,17 +113,16 @@
         area.innerHTML = ""; 
         const lines = [
             "VICTOR lighting the pyre",
-            "The flame consumes the secret",
             "FATHER IS VICTOR",
-            "The letter in steel",
             "Is your only truth"
         ];
         for(let text of lines) {
             let d = document.createElement('div'); d.className = "poem-line"; area.appendChild(d);
             for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 70)); }
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise(r => setTimeout(r, 800));
         }
         document.getElementById('gate-screen').onclick = () => {
+            document.getElementById('sfx-page').play().catch(()=>{});
             document.getElementById('gate-screen').style.display='none';
             document.getElementById('doc').style.display='block';
         };
@@ -172,6 +175,7 @@
     }
 
     async function triggerDiary() {
+        document.getElementById('sfx-page').play().catch(()=>{});
         document.getElementById('sfx-fire').play().catch(()=>{});
         const box = document.getElementById('doc-content');
         box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6;"></div>`;

@@ -6,148 +6,214 @@
     <title>FILE_0112_LUCA</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
-        :root { --paper: #dcdcdc; --ink: #1a1a1a; --accent: #900; }
-        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; }
-        
-        #gate-screen { position: fixed; z-index: 9999; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        #poem-area { line-height: 2.5; letter-spacing: 2px; color: #aaa; font-size: 1.1rem; text-align: center; font-style: italic; }
-        #click-hint { font-size: 0.7rem; color: #444; margin-top: 20px; letter-spacing: 5px; }
+        :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; --death: #1a120b; }
+        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        .report-sheet { width: 85%; max-width: 440px; height: 80vh; background: var(--paper); padding: 45px; box-sizing: border-box; display: none; color: var(--ink); position: relative; border: 1px solid #999; }
-        .hidden-report { background: #111 !important; color: #900 !important; border: 1px solid #f00 !important; }
-        h1 { font-size: 1.1rem; border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 30px; text-align: center; }
-        .section { margin-bottom: 25px; font-size: 0.95rem; line-height: 2.1; border-left: 3px solid #bbb; padding-left: 15px; }
-        .label { font-weight: 700; font-size: 0.75rem; color: #666; display: block; }
-        
-        @keyframes flash { 0%, 100% { background: #000; } 50% { background: #400; } }
-        .glitch-active { animation: flash 0.1s infinite; }
+        /* 窺視者背景：使用你提供的 Medium 圖片風格 */
+        #watcher-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/contain no-repeat #000; 
+            opacity: 0; transition: opacity 4s ease-in-out; z-index: 1;
+            filter: brightness(0.4) contrast(1.5);
+        }
+
+        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 1s; }
+        #poem-area { line-height: 2.8; letter-spacing: 3px; color: #888; text-align: center; font-style: italic; padding: 20px; font-size: 1.1rem; }
+
+        .report-sheet { 
+            width: 90%; max-width: 500px; height: 85vh; background: var(--paper); 
+            padding: 40px 30px; box-sizing: border-box; display: none; color: var(--ink); 
+            position: relative; z-index: 5; transition: 2.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto;
+            box-shadow: 0 0 60px rgba(0,0,0,1); border: 1px solid #999;
+        }
+        .report-sheet.burned { background: #050505 !important; color: #900 !important; border: 1px solid #400; filter: sepia(0.5) contrast(1.5); }
+
+        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: var(--death); z-index: 999; transition: 2s cubic-bezier(0.7, 0, 0.3, 1); opacity: 0.98; }
+
+        .input-gap { border-bottom: 2px solid var(--accent); cursor: pointer; font-weight: bold; padding: 0 5px; transition: 0.3s; }
+        .active-hint { animation: pulse 1.2s infinite; color: var(--accent); text-shadow: 0 0 5px rgba(128,0,0,0.5); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
+
+        #final-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 10000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+            color: #700; text-align: center; padding: 20px;
+        }
+
+        #input-panel { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; padding: 35px; box-sizing: border-box; display: none; z-index: 2000; border-top: 1px solid var(--accent); }
+        input { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2.2rem; outline: none; font-family: 'Noto Serif TC', serif; letter-spacing: 5px; }
     </style>
 </head>
 <body onclick="handleInteraction()">
 
+<div id="watcher-bg"></div>
+<div id="mud-up"></div>
+
+<div id="final-overlay">
+    <h2 id="final-title" style="letter-spacing: 12px; font-size: 1.6rem; margin-bottom: 10px;"></h2>
+    <p id="final-sub" style="font-size: 0.95rem; color: #444; line-height: 1.6;"></p>
+    <p style="font-size: 0.6rem; color: #222; margin-top: 60px; letter-spacing: 2px;">[ 重新整理網頁以再次連結 ]</p>
+</div>
+
 <div id="gate-screen">
     <div id="poem-area"></div>
-    <div id="click-hint">[ CLICK TO RECALL ]</div>
+    <p style="color:#222; font-size:0.7rem; margin-top:30px; letter-spacing:4px;">[ CLICK TO RECALL ]</p>
 </div>
 
 <div class="report-sheet" id="doc">
-    <h1 id="title-main"></h1>
-    <div id="content-area"></div>
+    <h1 style="font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center; letter-spacing: 2px;">【臨床鑑定報告：0112 號個案行為觀測】</h1>
+    <div style="font-size: 0.75rem; border-bottom: 1px solid #999; margin-bottom: 25px; padding-bottom: 8px; color: #555;">
+        檔案編號：0112-L (Veil, Luca) | 記錄時間：14:00 - 20:00 (共計 6 小時)
+    </div>
+    
+    <p style="font-size: 0.9rem; line-height: 2;">個案被三名院生強行拖至北側集水區。霸凌者踩住了個案的左手背，將全身重量壓在上面，在泥濘中反覆碾壓。個案並未求饒，僅在骨骼發出悶響時，眼球出現劇烈的震顫，隨後便陷入更深的解離狀態。</p>
+    
+    <p style="font-size: 0.9rem; line-height: 2;">霸凌者在施暴過程中持續嘲笑其為「燒焦的孤兒」。他們大聲宣稱個案根本不是人類，只是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">? ? ? ?</span>。</p>
+
+    <p style="font-size: 0.9rem; line-height: 2;">他就像一個壞掉的零件，在暴雨中靜靜地等待崩潰。那枚被他死死捏在右手心的家徽扣 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">?</span>，尖銳的邊緣已經深深嵌入他的肉裡，那是他在這場霸凌中唯一與現實連結的證據。</p>
+</div>
+
+<div id="input-panel">
+    <input type="text" id="pass-field" placeholder="INPUT" autocomplete="off" spellcheck="false">
 </div>
 
 <script>
-    const poemLines = [
+    const lines = [
         "The fire consumes the secret's pale,",
         "Lifting up the crimson veil.",
-        "Through the mud and silent air,",
-        "The broken doll is waiting there."
+        "A single letter etched in steel,",
+        "Is all the truth he'll ever feel."
     ];
+    let started = false, solved = 0, errors = 0, idleTimer, audioCtx;
 
-    let audioCtx, rainNode, fireNode;
-    let started = false;
-    let isTyping = false;
-    let clicks = 0;
-
-    // --- 聲音合成引擎 ---
-    function createRain() {
-        const bufferSize = 2 * audioCtx.sampleRate,
-              buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate),
-              output = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-        
-        let whiteNoise = audioCtx.createBufferSource();
-        whiteNoise.buffer = buffer; whiteNoise.loop = true;
-        
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass'; filter.frequency.value = 1500;
-        
-        let gain = audioCtx.createGain();
-        gain.gain.value = 0.15; // 雨聲大小
-
-        whiteNoise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-        return whiteNoise;
-    }
-
-    function createFire() {
-        const bufferSize = audioCtx.sampleRate,
-              buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate),
-              output = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-
-        let noise = audioCtx.createBufferSource();
-        noise.buffer = buffer; noise.loop = true;
-
-        let filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass'; filter.frequency.value = 400;
-
-        let lfo = audioCtx.createOscillator();
-        lfo.type = 'sine'; lfo.frequency.value = 2;
-        let lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 0.3;
-
-        let gain = audioCtx.createGain();
-        gain.gain.value = 0.1;
-
-        lfo.connect(lfoGain); lfoGain.connect(gain.gain);
-        noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-        lfo.start();
-        return noise;
-    }
-
-    async function handleInteraction() {
+    function handleInteraction() {
         if (!started) {
             started = true;
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            rainNode = createRain(); fireNode = createFire();
-            rainNode.start(); fireNode.start();
-            document.getElementById('click-hint').style.display = 'none';
-            startPoem();
-        } else if (isTyping) {
-            clicks++;
-            if (clicks > 5) triggerGlitch();
+            initAudioEngine();
+            startTypewriter();
         }
+        resetIdle();
     }
 
-    async function startPoem() {
-        isTyping = true;
+    async function startTypewriter() {
         const area = document.getElementById('poem-area');
-        for (let line of poemLines) {
-            if (clicks > 5) return;
-            for (let char of line) {
-                if (clicks > 5) return;
-                area.innerHTML += char;
-                await new Promise(r => setTimeout(r, 80));
+        for (let line of lines) {
+            for (let char of line) { 
+                area.innerHTML += char; 
+                await new Promise(r => setTimeout(r, 65)); 
             }
-            area.innerHTML += "<br>";
-            await new Promise(r => setTimeout(r, 600));
+            area.innerHTML += "<br>"; 
+            await new Promise(r => setTimeout(r, 450));
         }
-        isTyping = false;
-        setTimeout(() => !clicks > 5 && enterDoc(), 2000);
+        setTimeout(revealDoc, 1000);
     }
 
-    function triggerGlitch() {
-        document.body.classList.add('glitch-active');
-        // 改變聲音為尖銳雜訊
-        rainNode.stop();
-        setTimeout(() => {
-            document.getElementById('gate-screen').style.display = 'none';
-            document.body.classList.remove('glitch-active');
-            const doc = document.getElementById('doc');
-            doc.style.display = 'block';
-            doc.classList.add('hidden-report');
-            document.getElementById('title-main').innerText = "SYSTEM_CRITICAL_ERROR";
-            document.getElementById('content-area').innerHTML = "<div class='section'><span class='label'>WARNING</span>檔案已崩潰。他在泥沼中看著你。為什麼要點這麼快？</div>";
-        }, 500);
-    }
-
-    function enterDoc() {
+    function revealDoc() {
         document.getElementById('gate-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('gate-screen').style.display = 'none';
             document.getElementById('doc').style.display = 'block';
-            document.getElementById('title-main').innerText = "CLINICAL_REPORT_0112";
-            document.getElementById('content-area').innerHTML = "<div class='section'><span class='label'>觀察</span>個案對遺物的執著近乎瘋狂...</div>";
+            resetIdle();
         }, 1000);
+    }
+
+    function resetIdle() {
+        clearTimeout(idleTimer);
+        // 若報告書顯示中且未解開密碼，啟動 10 秒靜止檢測
+        if (document.getElementById('doc').style.display === 'block' && solved < 2) {
+            idleTimer = setTimeout(triggerGazer, 10000); 
+        }
+    }
+
+    function triggerGazer() {
+        document.getElementById('watcher-bg').style.opacity = '0.8';
+        document.getElementById('doc').style.opacity = '0.15';
+        document.getElementById('doc').style.filter = 'blur(12px)';
+        document.getElementById('doc').style.transform = 'scale(0.9)';
+        setTimeout(() => triggerFinal("THE GAZER", "當你凝視深淵時，深淵也在看著你。", "WATCHER"), 4500);
+    }
+
+    function openInput(id) {
+        if (id === 'DOLL' && solved < 1) return;
+        document.getElementById('input-panel').style.display = 'block';
+        document.getElementById('pass-field').focus();
+        window.targetKey = id;
+    }
+
+    document.getElementById('pass-field').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const val = e.target.value.toUpperCase().trim();
+            if (val === window.targetKey) {
+                const el = document.getElementById('gap-' + window.targetKey);
+                el.innerText = window.targetKey;
+                el.classList.remove('active-hint');
+                el.style.color = 'var(--accent)';
+                solved++;
+                if (solved === 1) document.getElementById('gap-DOLL').classList.add('active-hint');
+                if (solved === 2) triggerFinal("RECALL SUCCESS", "現在，你終於看見他真正的樣子了。", "SUCCESS");
+            } else {
+                errors++;
+                if (errors >= 3) triggerFinal("MEMORY DROWNED", "過多的錯誤干擾了回憶，他在泥濘中窒息了。", "DEATH");
+            }
+            document.getElementById('input-panel').style.display = 'none';
+            e.target.value = "";
+        }
+    });
+
+    function triggerFinal(title, sub, type) {
+        clearTimeout(idleTimer);
+        if (type === "DEATH") document.getElementById('mud-up').style.bottom = '0';
+        if (type === "SUCCESS") document.getElementById('doc').classList.add('burned');
+        
+        setTimeout(() => {
+            document.getElementById('final-title').innerText = title;
+            document.getElementById('final-sub').innerText = sub;
+            document.getElementById('final-overlay').style.display = 'flex';
+            if (type === "WATCHER") document.getElementById('final-overlay').style.background = "radial-gradient(circle, #200 0%, #000 100%)";
+        }, 1800);
+    }
+
+    // --- 音效合成系統：純粹的物理建模 ---
+    function initAudioEngine() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // 雨聲：白噪音處理
+        const bufferSize = audioCtx.sampleRate * 2;
+        const rainBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = rainBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+        const rainSource = audioCtx.createBufferSource();
+        rainSource.buffer = rainBuffer;
+        rainSource.loop = true;
+
+        const rainFilter = audioCtx.createBiquadFilter();
+        rainFilter.type = 'lowpass';
+        rainFilter.frequency.value = 1100;
+
+        const rainGain = audioCtx.createGain();
+        rainGain.gain.value = 0.12;
+
+        rainSource.connect(rainFilter); rainFilter.connect(rainGain); rainGain.connect(audioCtx.destination);
+        rainSource.start();
+
+        // 火聲：低頻隨機脈衝
+        const fireGain = audioCtx.createGain();
+        fireGain.gain.value = 0.04;
+        const fireFilter = audioCtx.createBiquadFilter();
+        fireFilter.type = 'bandpass'; fireFilter.frequency.value = 450;
+
+        const lfo = audioCtx.createOscillator();
+        lfo.type = 'sine'; lfo.frequency.value = 1.5;
+        const lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 0.03;
+        lfo.connect(lfoGain); lfoGain.connect(fireGain.gain);
+
+        const fireSource = audioCtx.createBufferSource();
+        fireSource.buffer = rainBuffer; fireSource.loop = true;
+        fireSource.connect(fireFilter); fireFilter.connect(fireGain); fireGain.connect(audioCtx.destination);
+        fireSource.start(); lfo.start();
     }
 </script>
 </body>

@@ -6,289 +6,207 @@
     <title>FILE_0112_LUCA</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
-        :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; }
-        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
+        :root { --paper: #c8c8c8; --ink: #1a1a1a; --blood: rgba(138, 3, 3, 0.95); }
+        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow-x: hidden; height: 100vh; }
 
-        /* 命名與進入介面 */
-        #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .name-box { border: none; background: none; border-bottom: 2px solid #333; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; letter-spacing: 2px; margin-bottom: 20px; }
-        .enter-btn { background: none; border: 1px solid #444; color: #888; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; font-size: 0.8rem; transition: 0.3s; }
+        /* 門禁區域 */
+        #name-gate, #gate-screen { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #gate-screen { z-index: 1000; display: none; cursor: pointer; }
+        .name-box { border: none; background: none; border-bottom: 2px solid #333; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; }
+        .enter-btn { background: none; border: 1px solid #444; color: #888; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.3s; }
         .enter-btn:hover { border-color: #800; color: #fff; box-shadow: 0 0 15px #800; }
 
-        /* 前傳詩歌 */
-        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        #poem-area { line-height: 2.5; letter-spacing: 4px; color: #fff; text-shadow: 0 0 10px rgba(255,255,255,0.5); text-align: center; font-style: italic; padding: 40px; font-size: 1rem; }
-
-        /* 報告書樣式 */
+        /* 報告書樣式 - 修正排版與高度 */
         .report-sheet { 
-            width: 92%; max-width: 550px; height: 88vh; background: var(--paper); 
-            padding: 45px 35px; box-sizing: border-box; display: none; color: var(--ink); 
-            position: relative; z-index: 5; margin: 6vh auto; overflow-y: auto;
-            box-shadow: 0 0 100px #000; border: 1px solid #999;
+            width: 92%; max-width: 580px; min-height: 90vh; background: var(--paper); 
+            padding: 50px 40px 80px 40px; box-sizing: border-box; display: none; color: var(--ink); 
+            position: relative; z-index: 5; margin: 3vh auto; overflow: visible;
+            box-shadow: 0 0 120px #000; border: 1px solid #999; transition: filter 2s, opacity 2s;
         }
 
-        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 8px; border-bottom: 1px solid #555; transition: 0.3s; display: inline-block; min-width: 30px; text-align: center; }
-        .solved { background: transparent !important; color: #800 !important; font-weight: bold; border-bottom: 2px solid #800 !important; cursor: default; }
+        .blood-splatter { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; opacity: 0.9; display: none; }
+        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 8px; border-bottom: 1px solid #555; display: inline-block; min-width: 60px; text-align: center; font-weight: bold; }
+        .solved { background: transparent !important; color: #b00 !important; border-bottom: 2px solid #b00 !important; cursor: default; }
 
-        /* 槍擊層 */
+        /* 閒置背景 */
+        #eye-bg { position: fixed; top:0; left:0; width:100%; height:100%; background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/cover; opacity:0; z-index:1; pointer-events:none; filter: grayscale(1) contrast(2.2) brightness(0.25); transition: opacity 3.5s; }
+
+        /* 槍擊結局 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #000; display: none; align-items: center; justify-content: center; }
-        .death-paper { width: 90%; max-width: 450px; background: #eee; color: #111; padding: 35px; border: 15px double #300; line-height: 1.8; font-size: 0.9rem; position: relative; box-shadow: 0 0 50px #f00; }
-        .gun-flash { position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100001; display:none; }
-
-        /* 眼球背景 */
-        #eye-bg { position: fixed; top:0; left:0; width:100%; height:100%; background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/cover; opacity:0; z-index:1; pointer-events:none; filter: grayscale(1) contrast(2) brightness(0.15); transition: opacity 4s; }
+        .death-paper { width: 92%; max-width: 500px; background: #fdfdfd; color: #111; padding: 45px; border: 20px double #400; position: relative; box-shadow: 0 0 80px #f00; }
+        #gun-flash { position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100001; display:none; }
 
         #input-panel { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; padding: 30px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid #800; }
         #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 1.8rem; outline: none; }
-        h1 { font-size: 1.2rem; border-bottom: 3px double #333; padding-bottom: 15px; text-align: center; letter-spacing: 2px; }
-        h2 { font-size: 1rem; margin-top: 25px; border-left: 6px solid #800; padding-left: 12px; background: rgba(0,0,0,0.05); }
-        p { font-size: 0.9rem; line-height: 2.1; margin-bottom: 1.5em; text-align: justify; }
+        
+        h1 { font-size: 1.3rem; border-bottom: 3px double #333; padding-bottom: 15px; text-align: center; letter-spacing: 2px; margin-bottom: 30px; }
+        h2 { font-size: 1rem; border-left: 6px solid #800; padding-left: 12px; margin-top: 30px; margin-bottom: 15px; background: rgba(0,0,0,0.03); }
+        p { line-height: 2.3; margin-bottom: 1.5em; text-align: justify; }
+        .footer-sig { margin-top: 80px; text-align: right; font-size: 0.85rem; border-top: 1px dashed #777; padding-top: 20px; font-style: italic; }
     </style>
 </head>
-<body>
+<body onmousemove="resetIdleTimer()" ontouchstart="resetIdleTimer()">
 
 <div id="eye-bg"></div>
 
 <div id="name-gate">
-    <div style="color: #444; letter-spacing: 5px; margin-bottom: 30px; font-size: 0.75rem;">LUCIANO FAMILY ARCHIVE - LOGIN</div>
-    <input type="text" id="user-name" class="name-box" maxlength="12" spellcheck="false" autocomplete="off">
-    <button class="enter-btn" onclick="confirmName()">[ EXECUTE ]</button>
+    <div style="color: #444; letter-spacing: 5px; margin-bottom: 30px; font-size: 0.75rem;">SYSTEM IDENTIFICATION REQUIRED</div>
+    <input type="text" id="user-name" class="name-box" placeholder="輸入解密者代號" maxlength="12">
+    <button class="enter-btn" onclick="confirmName()">[ AUTHORIZE ]</button>
 </div>
 
 <div id="gate-screen">
-    <div id="poem-area"></div>
-    <div id="click-prompt" style="color:#fff; font-size:0.7rem; letter-spacing:10px; margin-top:40px; opacity:0.4;">[ CLICK TO WITNESS THE TRUTH ]</div>
+    <div id="poem-area" style="line-height:3.2; letter-spacing:4px; color:#fff; text-align:center; font-style:italic; padding:40px;"></div>
+    <div style="color:#600; font-size:0.75rem; margin-top:40px; letter-spacing:10px; opacity:0.6;">[ CLICK TO OPEN ARCHIVE ]</div>
 </div>
 
-<div class="report-sheet" id="doc" onmousemove="resetIdle()" onclick="resetIdle()">
+<div class="report-sheet" id="doc">
+    <div class="blood-splatter" id="blood-overlay"></div>
     <div id="report-header">
-        <div style="position:absolute; border:3px solid #800; color:#800; padding:5px 10px; font-weight:bold; transform:rotate(-15deg); opacity:0.5; font-size:0.8rem; top:25px; right:25px;">LEVEL 5 CLEARANCE</div>
+        <div style="position:absolute; border:4px solid #800; color:#800; padding:5px 12px; font-weight:bold; transform:rotate(-18deg); opacity:0.7; font-size:0.85rem; top:25px; right:25px;">LEVEL 5 CLEARANCE</div>
         <h1>臨床行為觀測詳細報告：0112 號</h1>
     </div>
     
     <div id="doc-content">
-        <p><strong>觀測對象：</strong> Luca (Case ID: <span id="gap-SURNAME" style="background:#1a1a1a;color:#1a1a1a">███</span>)</p>
+        <p><strong>觀測對象：</strong> Luca (Case ID: <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span>)</p>
 
-        <h2>一、 現場行為紀錄：極端痛覺剝離</h2>
-        <p>在觀測期間，個案被置於極端負面的物理環境中。儘管多次遭受施暴者的肢體踐踏，甚至在左手骨骼發出清晰可辨的碎裂聲時，個案依然維持著令人驚悚的靜默。這種狀態並非勇氣，而是一種生理性的「痛覺阻斷」。</p>
-        <p>施暴者在施暴過程中多次嘲諷個案，稱其為在那場毀滅性火災中遺留下來的、缺乏情感回饋機制的 <span id="gap-DOLL" class="input-gap" onclick="openInput('DOLL')">████</span>。觀測員注意到，個案的瞳孔始終聚焦於虛無處，彷彿靈魂早已撤離這具殘破的軀殼。</p>
+        <h2>一、 現場行為紀錄：痛覺阻斷與精神解離</h2>
+        <p>在長達六小時的觀測週期內，個案被置於極端負面的物理環境中。儘管多次遭受施暴者（代號：K）的肢體踐踏與重擊，甚至在左手掌骨發出清晰可辨的碎裂聲時，個案的生命指標雖有波動，卻未發出任何尖叫。瞳孔始終維持在非自然的擴大狀態，對外部光源無反應。此現象判定為深層精神解離，其意識已撤離物理軀殼以應對不可承受的痛苦。施暴者多次嘲諷其為在那場毀滅性火災中遺留下來的、缺乏情感回饋機制的冷酷 <span id="gap-DOLL" class="input-gap" onclick="openInput('DOLL')">████</span>。</p>
 
-        <h2>二、 核心物證分析：執著的家族殘影</h2>
-        <p>儘管個案對外界傷害毫無反應，但其右手始終死死扣住一枚已經扭曲變形的金屬家徽。在長達六小時的虐待後，個案的手掌因過度用力而發生痙攣，指縫間不斷流出暗紅色的血液，將家徽上的刻字染紅。</p>
-        <p>那是一個清晰的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。這枚家徽似乎是連結個案殘存意識與現實世界的唯一錨點。任何試圖強行奪取該物證的行為，皆會導致個案出現嚴重的肌肉顫抖與呼吸急促。</p>
+        <h2>二、 核心物證分析：殘存執念之錨點</h2>
+        <p>觀測發現，個案右手掌心始終死死扣住一枚已經嚴重扭曲變形的金屬家徽。在施暴過程中，個案指縫間滲出的血液已完全浸染該物標，使其表面呈現一種暗紅色的黏稠質感。經光學放大檢測，扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。任何試圖強行奪取該物件的動作都會引發個案劇烈的肌肉痙攣與呼吸驟停。判定該物標為個案與「過去現實」連結的唯一信物，亦是其最後的精神防線。</p>
 
-        <h2>三、 監護人背景：名為救贖的監視</h2>
-        <p>火災廢墟中的倖存並非偶然。當日，名為 <span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span> 的男子以「家族救助者」的身份迅速介入。然而，根據秘密監控顯示，該男子對個案的關懷僅存在於表面，私下則透過各種極端手段測試個案的反應邊界。</p>
-        <p>該男子似乎在恐懼著什麼——他在恐懼個案憶起那一晚如地獄般的熱浪，恐懼個案憶起是誰在那場大火中親手鎖上了逃生的大門。</p>
+        <h2>三、 監護人背景：名為救贖的監視隔離</h2>
+        <p>火災事件發生後，名為 <span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span> 的男子以「家族唯一生還救助者」的身份迅速介入，並將個案長期隔離於私人觀測區。然而，根據秘密截獲的音訊顯示，該男子對個案的關懷行為極具實驗性質。其核心目標似乎在於透過物理與心理的極端刺激，觀察個案是否會憶起那一晚如地獄般的熱浪，以及那場火災真正的起點。該男子對個案的控制慾表現出嚴重的病態趨向。</p>
+
+        <div class="footer-sig">
+            二等觀測員 署名：[ 數據加密遮蔽 ]<br>
+            觀測地點：Luciano 私人醫療研究室
+        </div>
     </div>
 </div>
 
 <div id="input-panel">
-    <input type="text" id="pass-field" placeholder="WAITING FOR KEYWORD..." autocomplete="off">
+    <input type="text" id="pass-field" placeholder="WAITING FOR DECRYPT..." autocomplete="off">
 </div>
 
 <div id="scare-layer">
-    <div id="death-paper" class="death-paper"></div>
+    <div class="death-paper">
+        <div id="death-content"></div>
+    </div>
 </div>
-<div id="gun-flash" class="gun-flash"></div>
+<div id="gun-flash"></div>
+
+<audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&"></audio>
 
 <script>
     let playerName = "";
-    let solved = {V:false, DOLL:false, VICTOR:false};
+    let solved = {"1102":false, "DOLL":false, "V":false, "VICTOR":false};
     let errors = 0;
-    let audioCtx;
-    let rainNode;
     let idleTimer;
 
-    function initAudio() {
-        if (audioCtx) return;
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // 模擬雨聲
-        const bufferSize = 2 * audioCtx.sampleRate;
-        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            output[i] = Math.random() * 2 - 1;
-        }
-        rainNode = audioCtx.createBufferSource();
-        rainNode.buffer = noiseBuffer;
-        rainNode.loop = true;
-        const lowpass = audioCtx.createBiquadFilter();
-        lowpass.type = 'lowpass';
-        lowpass.frequency.value = 1000;
-        const rainGain = audioCtx.createGain();
-        rainGain.gain.value = 0.15; // 基礎雨聲音量
-        rainNode.connect(lowpass);
-        lowpass.connect(rainGain);
-        rainGain.connect(audioCtx.destination);
-        rainNode.start();
-    }
-
-    function playSfx(freq, vol, dur, type = 'sine') {
-        if(!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        g.gain.setValueAtTime(vol, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
-        osc.connect(g); g.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + dur);
-    }
-
-    // 真正的槍聲 Jump Scare
-    function playGunshotScare() {
-        if(!audioCtx) return;
-        const mainOsc = audioCtx.createOscillator();
-        const mainGain = audioCtx.createGain();
-        mainOsc.type = 'sawtooth';
-        mainOsc.frequency.setValueAtTime(100, audioCtx.currentTime);
-        mainOsc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.3);
-        mainGain.gain.setValueAtTime(3.0, audioCtx.currentTime); // 極大音量
-        mainGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
-        mainOsc.connect(mainGain); mainGain.connect(audioCtx.destination);
-        
-        const whiteNoise = audioCtx.createBufferSource();
-        const bufferSize = audioCtx.sampleRate * 1.5;
-        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-        const data = buffer.getChannelData(0);
-        for(let i=0; i<bufferSize; i++) data[i] = Math.random();
-        whiteNoise.buffer = buffer;
-        const noiseGain = audioCtx.createGain();
-        noiseGain.gain.setValueAtTime(1.0, audioCtx.currentTime);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
-        whiteNoise.connect(noiseGain); noiseGain.connect(audioCtx.destination);
-        
-        mainOsc.start(); whiteNoise.start();
-    }
-
-    async function typeText(element, text, speed = 40) {
-        for (let char of text) {
-            element.innerHTML += char;
-            playSfx(400 + Math.random()*200, 0.02, 0.05);
-            await new Promise(r => setTimeout(r, speed));
-        }
-    }
-
     function confirmName() {
-        const input = document.getElementById('user-name');
-        if(input.value.trim() !== "") {
-            playerName = input.value.trim();
-            initAudio();
-            document.getElementById('name-gate').style.display = 'none';
-            document.getElementById('gate-screen').style.display = 'flex';
-            startPoem();
-        }
+        const val = document.getElementById('user-name').value.trim();
+        if(val) { playerName = val; document.getElementById('name-gate').style.display='none'; document.getElementById('gate-screen').style.display='flex'; startPoem(); }
     }
 
     async function startPoem() {
         const area = document.getElementById('poem-area');
         const lines = ["The fire consumes the secret's pale,", "Lifting up the crimson Veil.", "A single letter etched in steel,", "Is all the truth he'll ever feel."];
         for(let line of lines) {
-            let div = document.createElement('div');
-            area.appendChild(div);
-            await typeText(div, line, 35);
-            await new Promise(r => setTimeout(r, 400));
+            let d = document.createElement('div'); area.appendChild(d);
+            for(let char of line) { d.innerHTML += char; await new Promise(r=>setTimeout(r, 50)); }
+            await new Promise(r=>setTimeout(r, 500));
         }
+        document.getElementById('gate-screen').onclick = () => {
+            document.getElementById('gate-screen').style.display='none';
+            document.getElementById('doc').style.display='block';
+            resetIdleTimer();
+        };
     }
 
-    document.getElementById('gate-screen').onclick = () => {
-        if(document.getElementById('poem-area').children.length >= 4) {
-            document.getElementById('gate-screen').style.display = 'none';
-            document.getElementById('doc').style.display = 'block';
-            playSfx(150, 0.5, 0.5, 'triangle');
-            resetIdle();
-        }
-    };
-
-    function resetIdle() {
+    function resetIdleTimer() {
         if (document.getElementById('doc').style.display !== 'block') return;
         clearTimeout(idleTimer);
         document.getElementById('eye-bg').style.opacity = '0';
+        document.getElementById('doc').style.filter = 'none';
+        document.getElementById('doc').style.opacity = '1';
         idleTimer = setTimeout(() => {
             document.getElementById('eye-bg').style.opacity = '1';
-            document.getElementById('doc').style.filter = 'blur(12px) brightness(0.2)';
-            playSfx(55, 0.4, 5);
-        }, 18000);
+            document.getElementById('doc').style.filter = 'blur(25px) brightness(0.15)';
+            document.getElementById('doc').style.opacity = '0.2';
+        }, 15000); // 15秒觸發閒置
     }
 
     function openInput(id) {
-        playSfx(200, 0.3, 0.3, 'triangle');
-        document.getElementById('input-panel').style.display = 'block';
+        document.getElementById('input-panel').style.display='block';
         document.getElementById('pass-field').focus();
         window.targetKey = id;
     }
 
-    document.getElementById('pass-field').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
+    document.getElementById('pass-field').onkeypress = (e) => {
+        if(e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
-            if (val === window.targetKey) {
+            if(val === window.targetKey) {
                 solved[window.targetKey] = true;
                 const gap = document.getElementById('gap-' + window.targetKey);
-                gap.innerHTML = window.targetKey;
-                gap.className = "solved"; 
-                gap.onclick = null;
-                playSfx(300, 0.3, 0.2);
-                if (solved.V && solved.DOLL && solved.VICTOR) triggerDiary();
+                gap.innerHTML = window.targetKey; gap.className = "solved"; gap.onclick = null;
+                if(Object.values(solved).every(v => v)) triggerDiary();
             } else {
-                errors++;
-                if (errors >= 5) triggerDeath();
+                errors++; if(errors >= 5) triggerDeath();
             }
-            document.getElementById('input-panel').style.display = 'none';
-            e.target.value = "";
+            document.getElementById('input-panel').style.display='none'; e.target.value="";
         }
-    });
+    }
 
     function triggerDeath() {
-        clearTimeout(idleTimer);
+        const gun = document.getElementById('sfx-gunshot');
         const flash = document.getElementById('gun-flash');
-        playGunshotScare();
+        gun.play();
         flash.style.display = 'block';
-        setTimeout(() => flash.style.display = 'none', 120);
+        setTimeout(() => flash.style.display = 'none', 100);
 
         const killers = ["Killian Luciano", "Theodore Luciano"];
         const killer = killers[Math.floor(Math.random()*killers.length)];
         
-        document.getElementById('scare-layer').style.display = 'flex';
-        document.getElementById('death-paper').innerHTML = `
-            <h1 style="color:#800">UNAUTHORIZED ACCESS: TERMINATED</h1>
-            <p><strong>SUBJECT:</strong> ${playerName}</p>
-            <p><strong>EXECUTOR:</strong> ${killer}</p>
-            <hr>
-            <div style="font-style:italic; font-weight:bold; color:#800; border-left:5px solid #800; padding-left:15px; margin: 20px 0;">
-                "You just became a permanent part of this report. In blood."<br>
-                「你剛成為這份報告的一部分——用你的鮮血。」
-            </div>
-            <p>
-                子彈擊穿額骨的悶響在封閉的檔案室內迴盪。${killer} 的表情在槍火的殘影中顯得無比冰冷。你感覺到一種極致的冰冷從眉心擴散，隨後是無盡的沉重感。<br><br>
-                <span style="color:#600; font-family:serif;">
-                The bullet expanded upon impact, shredding the prefrontal cortex instantly. ${playerName}'s body slumped against the cold metal cabinet, a warm, thick river of crimson staining the top-secret documents. The Luciano secrets are once again safe, guarded by the smell of gunpowder and the silence of the dead.
-                </span>
-            </p>
-            <div style="text-align:center; margin-top:20px; font-size:0.7rem; color:#888;">[ CONNECTION LOST ]</div>
-        `;
+        const reports = [
+            {
+                title: "【 終止訪問與抹除清單 】",
+                desc: `警告：未授權的深層讀取已觸發防禦機制。觀測者 ${playerName} 已被現場處決。處決者：${killer}。子彈由 0.45 口徑槍械射出，擊穿了額骨並瞬間破壞了前額葉皮質。現場血跡已覆蓋機密文件，確保秘密不再外洩。其生命體徵於處決後 0.4 秒消失，軀體將被送往焚化爐處理。`
+            },
+            {
+                title: "【 現場清理報告 - 威脅排除 】",
+                desc: `目標代號：${playerName}，因試圖讀取 0112 號檔案的核心加密內容而被列入抹除名單。${killer} 執行了最終指令。火藥的味道殘留在封閉的檔案室內，目標在死前表現出極度的驚恐。這份文件現在沾染了叛徒的血跡，它將與秘密一同腐爛。Luciano 家族不需要多餘的目擊者。`
+            }
+        ];
+        const r = reports[Math.floor(Math.random()*reports.length)];
+
+        setTimeout(() => {
+            document.getElementById('scare-layer').style.display = 'flex';
+            document.getElementById('death-content').innerHTML = `
+                <h1 style="color:#800; border-bottom:2px solid #800;">${r.title}</h1>
+                <p style="font-weight:bold; margin-top:20px;">執行狀態：已抹除 (REMOVED)</p>
+                <p style="font-size:0.95rem; line-height:2.1; color:#222;">${r.desc}</p>
+                <div style="text-align:center; margin-top:30px; font-size:0.75rem; color:#888;">[ 檔案已永久鎖定 ]</div>
+            `;
+        }, 50);
     }
 
     async function triggerDiary() {
-        clearTimeout(idleTimer);
-        document.getElementById('doc').style.background = "#050505";
-        document.getElementById('doc').style.color = "#d00";
-        document.getElementById('doc').style.transition = "2s";
         const box = document.getElementById('doc-content');
-        box.innerHTML = `<div id="final-diary" style="line-height:2.4; letter-spacing:1px; font-size:0.85rem;"></div>`;
-        const logs = [
-            " [ 19XX.07.12 - 真相之餘燼 ]",
-            "那一晚的熱浪...我至今仍能在夢中聞到那股皮肉燒焦的甜膩香氣。我看著火舌像貪婪的巨獸，將那座充滿謊言的宅邸一寸寸吞噬。那些平日裡高不可攀的靈魂，在火光中跪地求饒的模樣，真是我這輩子見過最美的演出。",
-            "我親手鎖上了門。然後，我在廢墟的陰影中找到了那個縮成一團的孩子。殺了他全家後，他竟然用那雙充滿淚水與煙塵的眼睛看著我，跪在我的皮鞋邊叫我『父親』——那一刻，我體會到了上帝般的快感。",
-            "這是我最傑出的作品。我監視著他，看他在泥濘裡像條被剪掉舌頭的狗一樣受辱，看他死守著那枚從他生父屍體上撕下來的 V 字家徽。每一天的折磨，都是為了讓那晚的熱浪永遠在他骨子裡燃燒。",
-            "Luciano 家族不需要脆弱的人性。如果他有一天因為這些真相而崩潰，那他不過是另一堆無用的焦炭。我將守望著他的毀滅，直到他徹底成為我手中最精緻、最殘破的玩偶。",
-            "—— Victor Luciano (記錄於血腥之夜)"
+        box.innerHTML = `<div id="final-diary" style="color:#b00; font-size:0.9rem; line-height:2.6; letter-spacing:1px; font-weight:bold;"></div>`;
+        const content = [
+            "【 19XX.07.12 - 餘燼中的私語 】",
+            "那一晚的熱浪至今仍是我最美妙的記憶。看著那座代表著虛偽與權勢的宅邸在火光中崩塌，聽著那些平時高傲的靈魂在火舌下發出困獸般的哀鳴，那真是上帝賜予我最傑出的演出。",
+            "我親手在外面鎖上了大門。看著那孩子，看他在焦黑的廢墟中縮成一團，用那雙盛滿絕望與煙塵的眼睛看著我，竟然顫抖著叫我『父親』——這是我聽過最荒誕也最令人愉悅的笑話。",
+            "我留下了他，將他製作成這份報告中最完美的玩偶。每天看著他在泥濘與折磨中掙扎，看他死守著那枚從他親生父親屍體上撕下來的家徽，那簡直是極致的藝術品。",
+            "如果他有一天能承擔住這份沈重的真相而崩潰，那他也不過是一堆無用的焦炭。我將守望著他的毀滅，直到最後一絲生命燃盡。",
+            "—— Victor Luciano (你們的好友)"
         ];
-        for(let line of logs) {
-            let p = document.createElement('p');
-            document.getElementById('final-diary').appendChild(p);
-            await typeText(p, line, 65);
-            await new Promise(r => setTimeout(r, 1200));
+        for(let line of content) {
+            let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
+            for(let char of line) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 65)); }
+            await new Promise(r=>setTimeout(r, 1500));
         }
     }
 </script>

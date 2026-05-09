@@ -6,67 +6,24 @@
     <title>FILE_0112_LUCA</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
-
-        :root { --paper: #dcdcdc; --ink: #1a1a1a; --accent: #900; --glitch: #f00; }
+        :root { --paper: #dcdcdc; --ink: #1a1a1a; --accent: #900; }
+        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center; }
         
-        body { 
-            background: #000; color: #ccc; font-family: 'Noto Serif TC', serif;
-            margin: 0; padding: 0; overflow: hidden; height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-        }
+        #gate-screen { position: fixed; z-index: 9999; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        #poem-area { line-height: 2.5; letter-spacing: 2px; color: #aaa; font-size: 1.1rem; text-align: center; font-style: italic; }
+        #click-hint { font-size: 0.7rem; color: #444; margin-top: 20px; letter-spacing: 5px; }
 
-        /* 隱藏結局的閃爍效果 */
-        @keyframes flash {
-            0% { background: #000; }
-            5% { background: #600; }
-            10% { background: #000; }
-        }
-        .glitch-bg { animation: flash 0.2s ease; }
-
-        .report-sheet {
-            width: 85%; max-width: 440px; height: 80vh;
-            background: var(--paper); padding: 45px; box-sizing: border-box;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            position: relative; border: 1px solid #999; transform: rotate(-0.5deg);
-            overflow-y: auto; display: none; color: var(--ink);
-        }
-
-        /* 隱藏報告書的特殊樣式 */
-        .hidden-report { background: #1a1a1a !important; color: #900 !important; border: 2px solid #900 !important; }
-        .hidden-report h1 { border-bottom: 2px solid #900 !important; }
-        .hidden-report .label { color: #500 !important; }
-
-        h1 { font-size: 1.1rem; border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 30px; text-align: center; letter-spacing: 6px; font-weight: 700; }
+        .report-sheet { width: 85%; max-width: 440px; height: 80vh; background: var(--paper); padding: 45px; box-sizing: border-box; display: none; color: var(--ink); position: relative; border: 1px solid #999; }
+        .hidden-report { background: #111 !important; color: #900 !important; border: 1px solid #f00 !important; }
+        h1 { font-size: 1.1rem; border-bottom: 2px solid #333; padding-bottom: 12px; margin-bottom: 30px; text-align: center; }
         .section { margin-bottom: 25px; font-size: 0.95rem; line-height: 2.1; border-left: 3px solid #bbb; padding-left: 15px; }
-        .label { font-weight: 700; font-size: 0.75rem; color: #666; display: block; margin-bottom: 6px; letter-spacing: 1px; }
-
-        .black-out {
-            background: #111; color: #111; padding: 0 10px; cursor: pointer; transition: 0.4s;
-            border-bottom: 2px solid var(--accent); letter-spacing: 5px; display: inline-block;
-        }
-        .active-target { animation: pulse-red 1.8s infinite; }
-        @keyframes pulse-red { 0%, 100% { background: #000; } 50% { background: #400; box-shadow: 0 0 12px rgba(255,0,0,0.4); } }
-
-        #gate-screen {
-            position: fixed; z-index: 9999; width: 100%; height: 100%; background: #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px; box-sizing: border-box; cursor: pointer;
-        }
-        #poem-area { max-width: 100%; line-height: 2.5; letter-spacing: 2px; color: #aaa; font-size: 1.1rem; text-align: center; font-style: italic; }
-        #click-hint { font-size: 0.7rem; color: #333; margin-top: 20px; letter-spacing: 5px; }
-
-        #input-panel {
-            position: fixed; bottom: 0; width: 100%; background: #050505;
-            padding: 40px; box-sizing: border-box; display: none; z-index: 6000;
-            border-top: 2px solid var(--accent);
-        }
-        input {
-            width: 100%; background: transparent; border: none; color: #fff; font-family: 'Noto Serif TC';
-            font-size: 2.5rem; text-align: center; outline: none; letter-spacing: 15px;
-        }
+        .label { font-weight: 700; font-size: 0.75rem; color: #666; display: block; }
+        
+        @keyframes flash { 0%, 100% { background: #000; } 50% { background: #400; } }
+        .glitch-active { animation: flash 0.1s infinite; }
     </style>
 </head>
-<body onclick="handleGlobalClick()">
+<body onclick="handleInteraction()">
 
 <div id="gate-screen">
     <div id="poem-area"></div>
@@ -78,14 +35,6 @@
     <div id="content-area"></div>
 </div>
 
-<div id="input-panel">
-    <input type="text" id="pass-field" maxlength="4" placeholder="..." autocomplete="off">
-</div>
-
-<audio id="rain" src="https://assets.mixkit.co/active_storage/sfx/2526/2526-preview.mp3" loop></audio>
-<audio id="fire" src="https://assets.mixkit.co/active_storage/sfx/2471/2471-preview.mp3" loop></audio>
-<audio id="glitch-sfx" src="https://www.soundjay.com/communication/static-noise-01.mp3"></audio>
-
 <script>
     const poemLines = [
         "The fire consumes the secret's pale,",
@@ -94,101 +43,110 @@
         "The broken doll is waiting there."
     ];
 
-    // 正常報告書
-    const normalReport = [
-        { label: "臨床觀察", text: "個案在低溫環境下產生強烈的自我保護意識。 [TARGET1] 已被揭開。" },
-        { label: "物件關聯", text: "他不再認為自己是人，而是一具 [TARGET2]。" }
-    ];
+    let audioCtx, rainNode, fireNode;
+    let started = false;
+    let isTyping = false;
+    let clicks = 0;
 
-    // 隱藏報告書（強制介入時觸發）
-    const hiddenReport = [
-        { label: "SYSTEM ERROR", text: "檢測到未經授權的意識介入。記憶防線已崩潰。" },
-        { label: "深度禁區", text: "盧卡並未在那場大火中獲救。留下的只有被汙泥填滿的空殼。他在火光中看著你，他說：『為什麼現在才來？』" },
-        { label: "最後紀錄", text: "莊園從未焚毀，火在你的心裡。" }
-    ];
+    // --- 聲音合成引擎 ---
+    function createRain() {
+        const bufferSize = 2 * audioCtx.sampleRate,
+              buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate),
+              output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+        
+        let whiteNoise = audioCtx.createBufferSource();
+        whiteNoise.buffer = buffer; whiteNoise.loop = true;
+        
+        let filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 1500;
+        
+        let gain = audioCtx.createGain();
+        gain.gain.value = 0.15; // 雨聲大小
 
-    let audioStarted = false;
-    let isTypingPoem = false;
-    let interruptCount = 0;
-    let isGlitchTriggered = false;
-
-    function handleGlobalClick() {
-        if (!audioStarted) {
-            audioStarted = true;
-            document.getElementById('click-hint').style.display = 'none';
-            document.getElementById('rain').play();
-            document.getElementById('fire').play();
-            startPoem();
-            return;
-        }
-
-        // 如果在打字過程中狂點，觸發隱藏結局
-        if (isTypingPoem) {
-            interruptCount++;
-            if (interruptCount >= 5 && !isGlitchTriggered) {
-                triggerGlitch();
-            }
-        }
+        whiteNoise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+        return whiteNoise;
     }
 
-    async function typeWriter(text, element, speed = 80) {
-        for (let i = 0; i < text.length; i++) {
-            if (isGlitchTriggered && isTypingPoem) return; // 中斷正常流程
-            element.innerHTML += text.charAt(i);
-            await new Promise(res => setTimeout(res, speed));
+    function createFire() {
+        const bufferSize = audioCtx.sampleRate,
+              buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate),
+              output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+        let noise = audioCtx.createBufferSource();
+        noise.buffer = buffer; noise.loop = true;
+
+        let filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 400;
+
+        let lfo = audioCtx.createOscillator();
+        lfo.type = 'sine'; lfo.frequency.value = 2;
+        let lfoGain = audioCtx.createGain();
+        lfoGain.gain.value = 0.3;
+
+        let gain = audioCtx.createGain();
+        gain.gain.value = 0.1;
+
+        lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+        noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+        lfo.start();
+        return noise;
+    }
+
+    async function handleInteraction() {
+        if (!started) {
+            started = true;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            rainNode = createRain(); fireNode = createFire();
+            rainNode.start(); fireNode.start();
+            document.getElementById('click-hint').style.display = 'none';
+            startPoem();
+        } else if (isTyping) {
+            clicks++;
+            if (clicks > 5) triggerGlitch();
         }
     }
 
     async function startPoem() {
-        isTypingPoem = true;
+        isTyping = true;
         const area = document.getElementById('poem-area');
         for (let line of poemLines) {
-            if (isGlitchTriggered) return;
-            await typeWriter(line, area, 100);
+            if (clicks > 5) return;
+            for (let char of line) {
+                if (clicks > 5) return;
+                area.innerHTML += char;
+                await new Promise(r => setTimeout(r, 80));
+            }
             area.innerHTML += "<br>";
-            await new Promise(res => setTimeout(res, 800));
+            await new Promise(r => setTimeout(r, 600));
         }
-        isTypingPoem = false;
-        setTimeout(enterArchive, 2000);
+        isTyping = false;
+        setTimeout(() => !clicks > 5 && enterDoc(), 2000);
     }
 
     function triggerGlitch() {
-        isGlitchTriggered = true;
-        document.body.classList.add('glitch-bg');
-        document.getElementById('glitch-sfx').play();
-        
+        document.body.classList.add('glitch-active');
+        // 改變聲音為尖銳雜訊
+        rainNode.stop();
         setTimeout(() => {
             document.getElementById('gate-screen').style.display = 'none';
+            document.body.classList.remove('glitch-active');
             const doc = document.getElementById('doc');
-            doc.classList.add('hidden-report');
             doc.style.display = 'block';
-            showHiddenContent();
+            doc.classList.add('hidden-report');
+            document.getElementById('title-main').innerText = "SYSTEM_CRITICAL_ERROR";
+            document.getElementById('content-area').innerHTML = "<div class='section'><span class='label'>WARNING</span>檔案已崩潰。他在泥沼中看著你。為什麼要點這麼快？</div>";
         }, 500);
     }
 
-    async function showHiddenContent() {
-        await typeWriter("EXTRACTED_FORBIDDEN_DATA", document.getElementById('title-main'), 50);
-        const area = document.getElementById('content-area');
-        for (let content of hiddenReport) {
-            const sec = document.createElement('div');
-            sec.className = 'section';
-            area.appendChild(sec);
-            const lbl = document.createElement('span');
-            lbl.className = 'label';
-            sec.appendChild(lbl);
-            await typeWriter(content.label, lbl, 30);
-            await typeWriter(content.text, sec, 20);
-            await new Promise(res => setTimeout(res, 500));
-        }
-    }
-
-    async function enterArchive() {
-        if (isGlitchTriggered) return;
+    function enterDoc() {
         document.getElementById('gate-screen').style.opacity = '0';
         setTimeout(() => {
             document.getElementById('gate-screen').style.display = 'none';
             document.getElementById('doc').style.display = 'block';
-            // 跑正常報告書邏輯 (略，同前版本)
+            document.getElementById('title-main').innerText = "CLINICAL_REPORT_0112";
+            document.getElementById('content-area').innerHTML = "<div class='section'><span class='label'>觀察</span>個案對遺物的執著近乎瘋狂...</div>";
         }, 1000);
     }
 </script>

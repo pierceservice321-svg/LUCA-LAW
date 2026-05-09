@@ -14,8 +14,8 @@
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        #poem-area { margin-top: 5vh; line-height: 4; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
-        .poem-line { min-height: 1.5em; margin-bottom: 10px; opacity: 0; transition: opacity 1s; font-size: 1.2rem; }
+        #poem-area { margin-top: 5vh; line-height: 3; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
+        .poem-line { min-height: 1.5em; margin-bottom: 15px; opacity: 0; transition: opacity 0.8s; font-size: 1.3rem; }
 
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
@@ -34,10 +34,12 @@
         .death-stamp { position: absolute; top: 40px; right: 40px; border: 6px solid #800; color: #800; padding: 10px 30px; font-size: 2rem; transform: rotate(15deg); font-weight: bold; }
         
         .section-box { border: 1px solid #999; padding: 20px; margin: 20px 0; background: rgba(255,255,255,0.3); }
+        @keyframes blink { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
     </style>
 </head>
 <body>
 
+<!-- 音訊資源 -->
 <audio id="sfx-rain" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502554248154579065/Rain_Sounds_15_seconds_soundtrack.mp3?ex=6a002230&is=69fed0b0&hm=4a5d87db0a4bbd2c3a9a5f9e26ccbe9444bd943a0c81e9cfac9ebcf8f611e862&"></audio> 
 <audio id="sfx-fire" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502552548303962192/Fire_Crackling_-_Sound_Effect_HQ.mp3?ex=6a00209b&is=69fecf1b&hm=765827b3afee9dde88274c1a4e489d8f32ead7f82f7737713c7a1d9cb1f7ff36&"></audio>
 <audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&"></audio>
@@ -52,7 +54,6 @@
 
 <div id="gate-screen">
     <div id="poem-area"></div>
-    <div style="color:#500; font-size:0.8rem; margin-top:50px; letter-spacing:20px; opacity:0.6;">[ TAP TO OPEN FILE ]</div>
 </div>
 
 <div class="report-sheet" id="doc">
@@ -99,9 +100,10 @@
         if(!val) return;
         playerName = val;
         
+        // 立即啟動音軌 (利用 ACCESS 的點擊互動權限)
         const rain = document.getElementById('sfx-rain');
-        rain.volume = 0.5;
-        rain.play().catch(()=>{});
+        rain.volume = 1.0;
+        rain.play().catch(e => console.log("Audio play failed", e));
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
@@ -111,16 +113,22 @@
     async function startPoem() {
         const area = document.getElementById('poem-area');
         area.innerHTML = ""; 
+        // 詩歌文本修正：更簡短
         const lines = [
-            "VICTOR lighting the pyre",
             "FATHER IS VICTOR",
             "Is your only truth"
         ];
         for(let text of lines) {
             let d = document.createElement('div'); d.className = "poem-line"; area.appendChild(d);
-            for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 70)); }
-            await new Promise(r => setTimeout(r, 800));
+            for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 60)); }
+            await new Promise(r => setTimeout(r, 500));
         }
+        
+        const hint = document.createElement('div');
+        hint.style.cssText = "color:#500; font-size:0.8rem; margin-top:30px; letter-spacing:10px; animation: blink 2s infinite;";
+        hint.innerText = "[ TAP TO OPEN FILE ]";
+        area.appendChild(hint);
+
         document.getElementById('gate-screen').onclick = () => {
             document.getElementById('sfx-page').play().catch(()=>{});
             document.getElementById('gate-screen').style.display='none';
@@ -143,6 +151,10 @@
                 solved[window.targetKey] = true;
                 document.getElementById('gap-' + window.targetKey).innerHTML = val;
                 document.getElementById('gap-' + window.targetKey).className = "solved";
+                // 答對時播放輕微翻頁聲
+                document.getElementById('sfx-page').currentTime = 0;
+                document.getElementById('sfx-page').play().catch(()=>{});
+                
                 if(Object.values(solved).every(v => v)) triggerDiary();
             } else {
                 errors++;
@@ -157,13 +169,6 @@
         const scenarios = [
             { t: "槍械處決", s: "sfx-gunshot", c: "額葉穿孔", d: "VICTOR 對著你的眉心扣下扳機。" },
             { t: "火焰焚毀", s: "sfx-fire", c: "組織碳化", d: "出口被鎖死，你在烈火中化為灰燼。" },
-            { t: "腳步逼近", s: "sfx-footstep", c: "心臟驟停", d: "暗影中的腳步在你耳後停下，隨後是一片漆黑。" },
-            { t: "生化清理", s: "sfx-rain", c: "心室顫動", d: "高濃度藥劑注入，你的心跳在 VICTOR 的注視下歸零。" },
-            { t: "窒息清除", s: "sfx-footstep", c: "呼吸停擺", d: "一雙冰冷的手從後方扼住了你的喉嚨。" },
-            { t: "槍械連發", s: "sfx-gunshot", c: "多處臟器損傷", d: "VICTOR 毫不留情地清空了彈匣。" },
-            { t: "密室缺氧", s: "sfx-rain", c: "腦部缺氧", d: "實驗室氣壓驟降，你抓撓著牆壁直到失去意識。" },
-            { t: "致命重擊", s: "sfx-footstep", c: "顱內出血", d: "沉重的金屬管擊碎了你的頭蓋骨。" },
-            { t: "高溫熱輻射", s: "sfx-fire", c: "熱休克", d: "焚化爐的門緩緩關閉，這是你最後看見的畫面。" },
             { t: "泥池沈溺", s: "sfx-rain", c: "異物吸入窒息", d: "你被重新按入集水區的泥坑，這一次，沒有人鬆手。" }
         ];
         const sc = scenarios[Math.floor(Math.random()*scenarios.length)];
@@ -190,7 +195,7 @@
         for(let text of content) {
             let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
             for(let char of text) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
-            await new Promise(r=>setTimeout(r, 1500));
+            await new Promise(r=>setTimeout(r, 1200));
         }
     }
 </script>

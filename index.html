@@ -3,20 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_FINAL_REVISION</title>
+    <title>FILE_0112_DEATH_JOURNAL</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
+        /* 認證門戶 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
+        /* 詩歌過渡 */
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         #poem-area { margin-top: 5vh; line-height: 3; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
         .poem-line { min-height: 1.5em; margin-bottom: 15px; opacity: 0; transition: opacity 0.8s; font-size: 1.3rem; }
 
+        /* 報告文本 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
             padding: 70px 60px; box-sizing: border-box; display: none; color: var(--ink); 
@@ -26,9 +29,11 @@
         .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
+        /* 輸入面板 */
         #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 70px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid var(--accent); }
         #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3.5rem; outline: none; letter-spacing: 25px; font-family: 'Courier Prime'; }
 
+        /* 結局層 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; overflow-y: auto; }
         .death-paper { width: 85%; max-width: 680px; background: #fff; color: #111; padding: 50px; font-family: 'Courier Prime', monospace; border: 1px solid #000; position: relative; line-height: 1.6; }
         .death-stamp { position: absolute; top: 40px; right: 40px; border: 6px solid #800; color: #800; padding: 10px 30px; font-size: 2rem; transform: rotate(15deg); font-weight: bold; }
@@ -39,10 +44,11 @@
 </head>
 <body>
 
-<!-- 所有音效音軌 -->
+<!-- 音訊資源 -->
+<audio id="sfx-gunshot" preload="auto">
+    <source src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&" type="audio/mpeg">
+</audio>
 <audio id="sfx-rain" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502554248154579065/Rain_Sounds_15_seconds_soundtrack.mp3?ex=6a002230&is=69fed0b0&hm=4a5d87db0a4bbd2c3a9a5f9e26ccbe9444bd943a0c81e9cfac9ebcf8f611e862&"></audio> 
-<audio id="sfx-fire" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502552548303962192/Fire_Crackling_-_Sound_Effect_HQ.mp3?ex=6a00209b&is=69fecf1b&hm=765827b3afee9dde88274c1a4e489d8f32ead7f82f7737713c7a1d9cb1f7ff36&"></audio>
-<audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&"></audio>
 <audio id="sfx-footstep" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502551092221706310/Horror_Footsteps_Walking_Up_Stairs_Sound_Effect.mp3?ex=6a001f40&is=69fecdc0&hm=e484b58514f8ebb66cc15107c4f1d03a7cad16fddfb35a9cc21b2ed03a770673&"></audio>
 <audio id="sfx-page" src="https://www.soundjay.com/misc/sounds/paper-flip-1.mp3"></audio>
 
@@ -65,12 +71,12 @@
     <div id="doc-content">
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救。</p>
+            <p>個案於暴雨午後被三名院生強行帶往北側集水區。個案並未呼救，其意識已進入深層解離狀態。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的<strong>破布偶</strong>。</p>
         </div>
 
         <div class="section-box">
             <h2>二、 關鍵物證：血染的家徽</h2>
-            <p>在受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。儘管扣子邊緣因受壓而嵌入肉內，指縫滲出混著泥水的血跡，個案仍未鬆手。這枚家徽扣被視為連結個案原始家族身世的唯一實體殘留。</p>
+            <p>個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。儘管扣子嵌入肉內，指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
         </div>
 
         <div class="section-box">
@@ -96,23 +102,18 @@
     let solved = {"1102":false, "V":false, "VICTOR":false};
     let errors = 0;
 
-    // 系統啟動與音頻預熱
     function initSystem() {
         const val = document.getElementById('user-name').value.trim();
         if(!val) return;
         playerName = val;
         
-        // 播放背景雨聲
-        const rain = document.getElementById('sfx-rain');
-        rain.volume = 0.6;
-        rain.play();
+        document.getElementById('sfx-rain').volume = 0.5;
+        document.getElementById('sfx-rain').play();
 
-        // 關鍵：預熱槍聲與腳步聲（解決瀏覽器不播放未交互音訊的問題）
+        // 槍聲預熱
         const gunshot = document.getElementById('sfx-gunshot');
-        gunshot.volume = 0; gunshot.play().then(()=>{ gunshot.pause(); gunshot.volume = 1; });
-        
-        const foot = document.getElementById('sfx-footstep');
-        foot.volume = 0; foot.play().then(()=>{ foot.pause(); foot.volume = 1; });
+        gunshot.volume = 0;
+        gunshot.play().then(() => { gunshot.pause(); gunshot.currentTime = 0; gunshot.volume = 1; });
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
@@ -121,7 +122,6 @@
 
     async function startPoem() {
         const area = document.getElementById('poem-area');
-        area.innerHTML = ""; 
         const lines = ["FATHER IS VICTOR", "Is your only truth"];
         for(let text of lines) {
             let d = document.createElement('div'); d.className = "poem-line"; area.appendChild(d);
@@ -144,7 +144,6 @@
     function openInput(id) { 
         document.getElementById('input-panel').style.display='block'; 
         const field = document.getElementById('pass-field');
-        field.placeholder = "-".repeat(id === 'VICTOR' ? 6 : id.length); 
         field.focus(); window.targetKey = id; 
     }
 
@@ -152,19 +151,16 @@
         if(e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
             const isCorrect = (val === window.targetKey || (window.targetKey === 'VICTOR' && (val === 'VICTOR' || val === 'FATHER')));
+            
             if(isCorrect) {
                 solved[window.targetKey] = true;
                 document.getElementById('gap-' + window.targetKey).innerHTML = val;
                 document.getElementById('gap-' + window.targetKey).className = "solved";
-                
-                const pageSound = document.getElementById('sfx-page');
-                pageSound.currentTime = 0; pageSound.play();
-                
+                document.getElementById('sfx-page').play();
                 if(Object.values(solved).every(v => v)) setTimeout(triggerDiary, 800);
             } else {
                 errors++;
-                const foot = document.getElementById('sfx-footstep');
-                foot.currentTime = 0; foot.play();
+                document.getElementById('sfx-footstep').play();
                 if(errors >= 2) triggerDeath();
             }
             document.getElementById('input-panel').style.display='none'; 
@@ -173,48 +169,25 @@
     }
 
     function triggerDeath() {
-        const scenarios = [
-            { t: "顱腦槍械損傷 (Gunshot Wound)", s: "sfx-gunshot", c: "大腦皮質碎裂與立即性中樞神經失能", d: "執行者：**Victor**。點45口徑彈藥自額前正中央入彈，彈道貫穿枕骨。受試者在0.02秒內喪失意識。" },
-            { t: "全身性三度灼傷 (Full-thickness Burns)", s: "sfx-fire", c: "熱休克與呼吸道熱損傷導致窒息", d: "執行者：**Theodore**。封閉空間內注入高溫燃劑。受試者表皮呈現大面積碳化。" },
-            { t: "機械性窒息 (Mechanical Asphyxia)", s: "sfx-footstep", c: "甲狀軟骨骨折與頸部血管受壓", d: "執行者：**Killian**。從後方使用軍用絞殺術。受試者眼瞼出現針尖狀出血點，舌骨骨折。" },
-            { t: "多發性鈍擊外傷 (Multiple Blunt Trauma)", s: "sfx-footstep", c: "內臟破裂與急性腹膜內出血", d: "執行者：**Theodore**。使用重型金屬器械反覆擊打。檢驗顯示肝臟碎裂，肋骨多處粉碎性骨折。" },
-            { t: "藥物毒性反應 (Toxicological Liquidation)", s: "sfx-rain", c: "心肌去極化障礙與心室顫動", d: "執行者：**Victor**。靜脈注射高濃度氯化鉀。受試者心電圖在五秒內呈現直線。" },
-            { t: "肺部異物吸入窒息 (Aspiration Suffocation)", s: "sfx-rain", c: "泥漿堵塞支氣管導致氣體交換終止", d: "執行者：**Killian**。強行將受試者面部壓入泥坑中。肺泡內充滿混濁液體與細砂。" },
-            { t: "貫穿性胸部損傷 (Thoracic Penetration)", s: "sfx-gunshot", c: "心臟穿孔與大出血性休克", d: "執行者：**Victor**。半自動步槍近距離射擊。子彈撕裂左心室壁，胸腔積血達2500ml。" },
-            { t: "急性肺水腫與缺氧 (Hypoxia Cleanup)", s: "sfx-rain", c: "低氣壓環境導致之呼吸衰竭", d: "執行者：**Theodore**。實驗室氣壓泵全速抽空。受試者出現嚴重肺氣腫，血液轉為暗紫色。" },
-            { t: "脊髓離斷傷 (Spinal Cord Disruption)", s: "sfx-footstep", c: "頸椎脫位導致延髓受損", d: "執行者：**Killian**。採取頸部暴力扭轉。受試者呼吸中樞立即停止，神經傳導路徑徹底中斷。" },
-            { t: "開放性腹部創傷 (Open Abdominal Injury)", s: "sfx-gunshot", c: "腹主動脈斷裂與敗血性預兆", d: "執行者：**Victor**。槍械自下腹部擊穿。大量腸道組織受損，伴隨嚴重血管性失血。" }
-        ];
-        
-        const sc = scenarios[Math.floor(Math.random() * scenarios.length)];
-        
-        // 暴力觸發死亡音效
-        const audio = document.getElementById(sc.s);
-        audio.pause(); 
-        audio.currentTime = 0; 
-        audio.play().catch(e => console.log("Critical Audio Error", e));
+        const gunshot = document.getElementById('sfx-gunshot');
+        gunshot.currentTime = 0; gunshot.play();
 
         setTimeout(() => {
             document.getElementById('scare-layer').style.display = 'flex';
             document.getElementById('death-content').innerHTML = `
-                <p><strong>REPORT_ID:</strong> ERR_EXP_0${Math.floor(Math.random()*900)+100}</p>
                 <p><strong>SUBJECT:</strong> ${playerName}</p>
-                <p><strong>DIAGNOSIS:</strong> ${sc.t}</p>
+                <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷 (Gunshot Wound)</p>
                 <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-                <p><strong>MECHANISM:</strong><br>${sc.c}</p>
-                <p><strong>OBSERVATION LOG:</strong><br>${sc.d}</p>
-                <div style="margin-top:20px; font-size:0.7rem; color:#888;">* 數據已存檔於加密伺服器，嚴禁未經授權查閱。</div>
+                <p><strong>OBSERVATION LOG:</strong><br>執行者：Victor。子彈自額前正中央入彈。受試者在0.02秒內喪失意識。清理程序完成。</p>
             `;
-        }, 200);
+        }, 150);
     }
 
     async function triggerDiary() {
-        const pageSound = document.getElementById('sfx-page');
-        pageSound.currentTime = 0; pageSound.play();
-        document.getElementById('sfx-fire').play();
-
-        document.getElementById('report-title').remove();
-        document.getElementById('subject-header').remove();
+        document.getElementById('sfx-page').play();
+        document.getElementById('report-title').style.color = "#a00";
+        document.getElementById('report-title').innerText = "PRIVATE ACCESS GRANTED";
+        
         const box = document.getElementById('doc-content');
         box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
         
@@ -230,7 +203,7 @@
         for(let text of content) {
             let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
             for(let char of text) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
-            await new Promise(r=>setTimeout(r, 1200));
+            await new Promise(r=>setTimeout(r, 1000));
         }
     }
 </script>

@@ -3,192 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_DECODING</title>
+    <title>RECOVERY_SYSTEM_0112</title>
     <style>
-        :root { --paper: #f4f1ea; --ink: #222; --accent: #b00; }
+        :root { --paper: #c4c1b9; --ink: #1a1a1a; --accent: #8b0000; --shadow: rgba(0,0,0,0.8); }
+        
         body { 
             background: #000; color: #dcdcdc; font-family: 'Courier New', Courier, monospace;
             margin: 0; padding: 0; overflow: hidden; height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        
-        /* 啟動遮罩 */
-        #overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 1000; display: flex; 
-            align-items: center; justify-content: center; text-align: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        /* 檔案卡片 */
-        .file-container { width: 100%; height: 80vh; position: relative; perspective: 1000px; }
+        /* 呼吸感陰影動畫 */
+        .vignette {
+            position: fixed; top:0; left:0; width:100%; height:100%;
+            background: radial-gradient(circle, transparent 30%, #000 120%);
+            pointer-events: none; z-index: 100; animation: breathe 5s infinite;
+        }
+
+        /* 檔案容器 */
+        .container { 
+            width: 90%; max-width: 380px; height: 80vh; position: relative; 
+            transition: transform 0.5s;
+        }
+
         .file-page {
-            width: 85%; max-width: 350px; height: 100%;
-            background: var(--paper); color: var(--ink);
-            margin: 0 auto; padding: 30px; box-sizing: border-box;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            transition: 0.5s transform, 0.5s opacity;
-            border-radius: 2px; overflow-y: auto; border-left: 10px solid #ccc;
+            width: 100%; height: 100%; background: var(--paper); color: var(--ink);
+            padding: 30px; box-sizing: border-box; border-radius: 2px;
+            box-shadow: 0 0 50px #000; border-left: 10px solid #999;
+            position: absolute; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
+            overflow-y: auto;
         }
-        .file-page.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, -50%) rotateY(15deg); }
 
-        h2 { font-size: 1.1rem; border-bottom: 2px solid var(--ink); padding-bottom: 5px; margin-top: 0; }
-        p { font-size: 0.95rem; line-height: 1.8; margin: 15px 0; }
+        .hidden { opacity: 0; transform: scale(0.9) rotate(-2deg); pointer-events: none; }
 
-        /* 黑色抹除區 */
+        /* 黑色遮罩與提示 */
         .black-out {
-            background: #000; color: #000; cursor: pointer;
-            padding: 2px 8px; transition: 0.3s; user-select: none;
-            display: inline-block; border-radius: 2px;
+            background: #000; color: rgba(139, 0, 0, 0.5); /* 淡淡露出紅色的首字母 */
+            padding: 0 5px; cursor: pointer; transition: 0.3s;
+            border-radius: 2px; font-weight: bold; position: relative;
+        }
+        .black-out::after { content: attr(data-hint); position: absolute; left: 5px; color: rgba(139, 0, 0, 0.3); }
+
+        /* 結局戳印動畫 */
+        #stamp {
+            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%) scale(5);
+            border: 6px solid var(--accent); color: var(--accent);
+            padding: 10px 30px; font-size: 2.5rem; font-weight: bold;
+            opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+            z-index: 1000; transform: translate(-50%, -50%) rotate(-15deg) scale(3);
         }
 
-        /* 手機輸入區 */
+        /* 輸入法介面 */
         #input-box {
-            position: fixed; bottom: 0; width: 100%; background: #111;
-            padding: 20px; box-sizing: border-box; display: none; z-index: 500;
-            border-top: 2px solid var(--accent);
+            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95);
+            padding: 30px; box-sizing: border-box; display: none; z-index: 500;
+            border-top: 1px solid var(--accent);
         }
         input {
-            width: 100%; background: transparent; border: none;
-            color: var(--accent); font-size: 1.8rem; text-align: center; outline: none;
-            font-family: 'Courier New', Courier, monospace; text-transform: uppercase;
+            width: 100%; background: transparent; border: none; color: var(--accent);
+            font-size: 2rem; text-align: center; outline: none; letter-spacing: 5px;
         }
 
-        /* 結局畫面 */
-        #ending {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; display: none; z-index: 2000;
-            align-items: center; justify-content: center; text-align: center;
-        }
+        /* 動畫庫 */
+        @keyframes breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+        @keyframes shake { 0% { left:0; } 25% { left:-2px; } 50% { left:2px; } 100% { left:0; } }
+
+        .revealed-text { color: var(--accent); font-weight: bold; border-bottom: 1px solid var(--accent); }
     </style>
 </head>
 <body>
 
-<div id="overlay" onclick="startApp()">
-    <div>[ 偵測到受損檔案 0112 ]<br><br><span style="color:var(--accent); font-size:0.8rem;">點擊螢幕以解鎖記憶</span></div>
+<div class="vignette"></div>
+
+<!-- 啟動層 -->
+<div id="overlay" style="position:fixed; z-index:1000; width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="init()">
+    <div style="text-align:center; letter-spacing:3px;">[ 檔案 0112：深度讀取 ]<br><br><small style="color:#444;">點擊螢幕解鎖</small></div>
 </div>
 
-<div class="file-container">
-    <!-- 檔案一：案件報告 -->
+<div class="container" id="main-container">
+    <div id="stamp">RECOVERED</div>
+
+    <!-- 檔案一：火災報告 -->
     <div id="page1" class="file-page">
-        <h2>████ 縱火案 - 勘驗摘要</h2>
-        <p><strong>案發時間：</strong> ██月██日 21:12</p>
-        <p><strong>現場描述：</strong> 入口遭外部反鎖。火勢極快，疑使用高濃度助燃劑。</p>
-        <p><strong>證物補述：</strong> 幼兒身穿定製小西裝，金屬扣殘存字母 <span class="black-out" onclick="openInput('VEIL')">[V _ _ L]</span>。</p>
-        <p><strong>異常紀錄：</strong> 案發時，有人看見門後站著一個戴著 <span class="black-out" onclick="openInput('MASK')">[M _ _ K]</span> 的人影正在凝視火海。</p>
-        <p style="text-align:center; color:#999; font-size:0.7rem; margin-top:40px;">（ 左滑查看孤兒院日誌 >> ）</p>
+        <h2 style="font-size:1rem; border-bottom:1px solid #333;">MEMO: CASE_199X_FIRE</h2>
+        <p><strong>現場摘要：</strong></p>
+        <p>建築出口遭外部封鎖。火勢中心發現 Veil 夫婦遺骸，其死狀呈現極度扭曲的保護姿態。</p>
+        <p><strong>關鍵遺物：</strong></p>
+        <p>從幼兒（個案0112）手中取出的西裝扣，刻有被血跡覆蓋的字母：<span class="black-out" data-hint="V" onclick="ask('VEIL')">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+        <p><strong>目擊紀錄：</strong></p>
+        <p>案發當時，門外陰影處站著一個戴著 <span class="black-out" data-hint="M" onclick="ask('MASK')">&nbsp;&nbsp;&nbsp;&nbsp;</span> 的人影，個案對此展現異常沈默。</p>
+        <p id="p1-footer" style="margin-top:60px; font-size:0.7rem; color:#666; text-align:center;"><< 滑動翻閱日誌 >></p>
     </div>
 
-    <!-- 檔案二：觀察日誌 -->
+    <!-- 檔案二：孤兒院日誌 -->
     <div id="page2" class="file-page hidden">
-        <h2>聖瑪利亞孤兒院 - 觀察日誌</h2>
-        <p><strong>生活事件：</strong> 今日發生集體霸凌。霸凌者將其家徽金屬扣丟入泥地踩踏。</p>
-        <p><strong>個案反應：</strong> 0112 毫無反抗。神情像是一個被掏空的 <span class="black-out" onclick="openInput('DOLL')">[D _ _ L]</span>。</p>
-        <p><strong>診斷：</strong> 個案似乎認為黑暗比光更安全。</p>
-        <p style="text-align:center; color:#999; font-size:0.7rem; margin-top:40px;">（ << 右滑查看現場報告 ）</p>
+        <h2 style="font-size:1rem; border-bottom:1px solid #333;">LOG: SANTA_MARIA_0112</h2>
+        <p><strong>群體行為：</strong></p>
+        <p>今日發生集體霸凌，0112 被按在泥地中，其西裝殘片遭踐踏毀損。</p>
+        <p><strong>心理鑑定：</strong></p>
+        <p>個案並無流淚，亦無求救行為。他只是像個壞掉的 <span class="black-out" data-hint="D" onclick="ask('DOLL')">&nbsp;&nbsp;&nbsp;&nbsp;</span> 般注視著霸凌者。</p>
+        <p><strong>導師註記：</strong></p>
+        <p>他在黑暗中的視力似乎正在提升，這是不祥的徵兆。</p>
+        <p style="margin-top:60px; font-size:0.7rem; color:#666; text-align:center;"><< 滑動返回報告</p>
     </div>
 </div>
 
 <div id="input-box">
-    <input type="text" id="pass-input" maxlength="4" placeholder="....">
-</div>
-
-<div id="ending">
-    <h1 id="ending-text" style="font-size:1.2rem; letter-spacing:4px; color:var(--accent);"></h1>
+    <input type="text" id="user-input" placeholder="RECALL...">
 </div>
 
 <script>
-    // 音效資源 (使用開源素材)
     const sounds = {
-        fire: new Audio('https://assets.mixkit.co/active_storage/sfx/2437/2437-preview.mp3'), // 類火燒聲
-        orphan: new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'), // 類環境聲
-        paper: new Audio('https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3'),
+        bgm: new Audio('https://assets.mixkit.co/active_storage/sfx/2437/2437-preview.mp3'),
         type: new Audio('https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3'),
-        heart: new Audio('https://assets.mixkit.co/active_storage/sfx/2180/2180-preview.mp3')
+        stamp: new Audio('https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3')
     };
 
-    let currentTarget = "";
+    let targetCode = "";
     let startTime = 0;
-    let isStarted = false;
 
-    function startApp() {
-        isStarted = true;
-        startTime = Date.now();
+    function init() {
         document.getElementById('overlay').style.display = 'none';
-        sounds.fire.loop = true;
-        sounds.orphan.loop = true;
-        playBGM('fire');
+        sounds.bgm.loop = true;
+        sounds.bgm.play();
+        sounds.bgm.volume = 0.2;
+        startTime = Date.now();
     }
 
-    function playBGM(type) {
-        if (type === 'fire') {
-            sounds.fire.play(); sounds.fire.volume = 0.3;
-            sounds.orphan.pause();
-        } else {
-            sounds.orphan.play(); sounds.orphan.volume = 0.3;
-            sounds.fire.pause();
-        }
-    }
-
-    function openInput(target) {
-        if(!isStarted) return;
-        currentTarget = target;
-        sounds.type.play();
-        if(navigator.vibrate) navigator.vibrate(15);
+    function ask(code) {
+        targetCode = code;
         document.getElementById('input-box').style.display = 'block';
-        document.getElementById('pass-input').focus();
+        document.getElementById('user-input').focus();
+        sounds.type.play();
     }
 
-    // 滑動邏輯
+    // 結局邏輯補完
+    function triggerEnding(code) {
+        const time = (Date.now() - startTime) / 1000;
+        const inputArea = document.getElementById('input-box');
+        const stamp = document.getElementById('stamp');
+        
+        inputArea.style.display = 'none';
+        
+        // 視覺補完
+        const page = document.querySelector('.file-page:not(.hidden)');
+        const blanks = page.querySelectorAll('.black-out');
+        blanks.forEach(b => {
+            b.classList.remove('black-out');
+            b.classList.add('revealed-text');
+            b.innerText = code;
+        });
+
+        // 蓋章
+        setTimeout(() => {
+            stamp.style.opacity = "0.8";
+            stamp.style.transform = "translate(-50%, -50%) rotate(-15deg) scale(1)";
+            sounds.stamp.play();
+            if(navigator.vibrate) navigator.vibrate(200);
+            
+            // 插入最終鑑定報告
+            const result = document.createElement('div');
+            result.style.marginTop = "30px";
+            result.style.paddingTop = "10px";
+            result.style.borderTop = "2px solid var(--accent)";
+            result.style.color = var(--accent);
+            result.innerHTML = `<strong>【深度提取結果】</strong><br>${getStory(code, time)}`;
+            page.appendChild(result);
+        }, 500);
+    }
+
+    function getStory(code, time) {
+        if (code === "VEIL") return "回憶修復。個案記起了父母在火光中最後的推擠——那是為了讓他活下去。他重新獲得了身分的火種，鮮血依然溫熱。";
+        if (code === "MASK") return "危險覺醒。個案提取了當晚門後的視線。他記住了那個面具，並在意識深處與之共鳴。他不再是受害者，而是觀察者。";
+        if (code === "DOLL") return "生存代價。個案接受了孤兒院的定義，將自我封印在空殼之中。這是一場完美的遺忘，代價是靈魂的消逝。";
+        return "資料損毀。無法還原。";
+    }
+
+    // 滑動換頁
     let startX = 0;
     document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
     document.addEventListener('touchend', e => {
         let diff = startX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) {
-            const p1 = document.getElementById('page1');
-            const p2 = document.getElementById('page2');
-            const isP1 = !p1.classList.contains('hidden');
-            
-            p1.classList.toggle('hidden', isP1);
-            p2.classList.toggle('hidden', !isP1);
-            sounds.paper.play();
-            playBGM(isP1 ? 'orphan' : 'fire');
+        if(Math.abs(diff) > 50) {
+            document.getElementById('page1').classList.toggle('hidden');
+            document.getElementById('page2').classList.toggle('hidden');
+            sounds.stamp.play();
         }
     });
 
-    // 輸入邏輯
-    document.getElementById('pass-input').addEventListener('keyup', function(e) {
-        if (e.key === 'Enter') {
-            const val = this.value.toUpperCase();
-            const time = (Date.now() - startTime) / 1000;
-
-            if (val === "VEIL") {
-                showEnding(time < 20 ? "TRUE" : "NORMAL");
-            } else if (val === "MASK" && time < 11.2) {
-                showEnding("SECRET");
-            } else if (val === "DOLL") {
-                showEnding("NORMAL");
-            } else {
-                if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
-                this.value = "";
-            }
+    document.getElementById('user-input').addEventListener('keyup', e => {
+        if(e.key === 'Enter') {
+            if(e.target.value.toUpperCase() === targetCode) triggerEnding(targetCode);
+            else { e.target.value = ""; document.getElementById('main-container').style.animation = "shake 0.2s 3"; }
         }
     });
-
-    function showEnding(type) {
-        const endView = document.getElementById('ending');
-        const endText = document.getElementById('ending-text');
-        endView.style.display = 'flex';
-        
-        if (type === "TRUE") endText.innerText = "THE BLOOD IS STILL WARM.";
-        else if (type === "SECRET") {
-            endText.innerText = "I SAW YOU SMILING.";
-            sounds.heart.play();
-        } else endText.innerText = "NOTHING BUT ASHES.";
-        
-        sounds.fire.pause();
-        sounds.orphan.pause();
-    }
 </script>
 </body>
 </html>

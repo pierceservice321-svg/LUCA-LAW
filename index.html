@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_REPORT_REVISION_V6</title>
+    <title>FILE_REPORT_REVISION_V7</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
-        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
+        body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; perspective: 1000px; }
 
-        /* 介面與按鈕 */
+        /* 門戶與按鈕 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
@@ -19,32 +19,36 @@
         #poem-area { margin-top: 5vh; line-height: 3; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
         .poem-line { min-height: 1.5em; margin-bottom: 15px; opacity: 0; transition: opacity 0.8s; font-size: 1.3rem; }
 
-        /* 實驗報告正文 */
+        /* 實驗報告正文容器 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
             padding: 50px 40px; box-sizing: border-box; display: none; color: var(--ink); 
             position: relative; z-index: 5; margin: 5vh auto; overflow-y: auto;
             border: 1px solid #777; box-shadow: inset 0 0 100px rgba(0,0,0,0.1), 0 0 80px rgba(0,0,0,0.9);
-            transition: background 1s ease;
+            transform-origin: left center;
         }
-        .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
-        .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
-        /* 翻頁特效動畫 */
-        @keyframes pageFlip {
-            0% { transform: rotateY(-20deg) scale(0.95); opacity: 0; }
-            100% { transform: rotateY(0deg) scale(1); opacity: 1; }
+        /* 翻頁動畫：旋轉 + 陰影變化 */
+        @keyframes pageFlipEffect {
+            0% { transform: rotateY(0deg); opacity: 1; }
+            30% { transform: rotateY(-15deg); filter: brightness(0.8); }
+            100% { transform: rotateY(0deg); opacity: 1; filter: brightness(1); }
         }
-        .flipping { animation: pageFlip 0.8s ease-out forwards; }
+        .flipping { animation: pageFlipEffect 0.8s ease-in-out; }
 
         /* 密碼輸入面板 */
-        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 15px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid var(--accent); }
+        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 20px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid var(--accent); }
         #pass-field { 
             width: 100%; background: none; border: none; color: #fff; text-align: center; 
-            font-size: 2.2rem; outline: none; letter-spacing: 12px; 
-            font-family: 'Courier Prime'; line-height: 1; height: 60px;
+            font-size: 2.5rem; outline: none; letter-spacing: 15px; 
+            font-family: 'Courier Prime'; line-height: 1;
         }
-        #pass-field::placeholder { color: #555; opacity: 1; letter-spacing: 12px; }
+        /* 強制 Placeholder 顯示為亮灰色 */
+        #pass-field::placeholder { color: #888 !important; opacity: 1 !important; letter-spacing: 15px; }
+
+        /* 解謎區域樣式 */
+        .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
+        .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
         /* 結局圖層 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; }
@@ -76,17 +80,15 @@
 
 <div class="report-sheet" id="doc">
     <h1 id="report-title">EXPERIMENTAL PATHOLOGY REPORT</h1>
-    <div id="doc-main-content">
-        <div id="subject-header">
-            <p><strong>SUBJECT:</strong> LUCA / <strong>BIRTH:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
+    <div id="doc-main-body">
+        <p><strong>SUBJECT:</strong> LUCA / <strong>BIRTH:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
+        <div class="section-box">
+            <h2>一、 現場觀測紀錄</h2>
+            <p>個案於暴雨午後被三名院生強行帶往北側集水區。個案並未呼救，其意識已進入深層解離狀態。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄的<strong>破布偶</strong>。</p>
         </div>
         <div class="section-box">
-            <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>個案於暴雨午後被三名院生強行帶往北側集水區。個案並未呼救。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄的<strong>破布偶</strong>。</p>
-        </div>
-        <div class="section-box">
-            <h2>二、 關鍵物證：血染的家徽</h2>
-            <p>在受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
+            <h2>二、 關鍵物證</h2>
+            <p>在受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。</p>
         </div>
         <div class="section-box">
             <h2>三、 最高管理權限</h2>
@@ -144,14 +146,13 @@
     }
 
     function openInput(id) { 
-        const panel = document.getElementById('input-panel');
         const field = document.getElementById('pass-field');
-        panel.style.display='block'; 
+        document.getElementById('input-panel').style.display='block'; 
         
-        // 調整底線樣式，增加空格使其更易讀
-        if(id === '1102') field.placeholder = "____";
+        // 修正：使用更寬的底線與明確的空格
+        if(id === '1102') field.placeholder = "_ _ _ _";
         else if(id === 'V') field.placeholder = "_";
-        else if(id === 'VICTOR') field.placeholder = "______";
+        else if(id === 'VICTOR') field.placeholder = "_ _ _ _ _ _";
         
         field.value = "";
         field.focus(); 
@@ -169,10 +170,7 @@
                 gap.innerHTML = val;
                 gap.className = "solved";
                 pageSFX.play();
-                if(Object.values(solved).every(v => v)) {
-                    // 延遲一秒觸發日記，增加解完謎的成就感
-                    setTimeout(triggerDiary, 1000);
-                }
+                if(Object.values(solved).every(v => v)) setTimeout(triggerDiary, 1000);
             } else {
                 errors++;
                 footstepSFX.currentTime = 0; footstepSFX.play();
@@ -184,37 +182,33 @@
     }
 
     function triggerDeath() {
-        gunshotSFX.currentTime = 0; gunshotSFX.volume = 1.0;
-        gunshotSFX.play().then(() => {
-            setTimeout(() => {
-                document.getElementById('scare-layer').style.display = 'flex';
-                document.getElementById('death-content').innerHTML = `
-                    <p><strong>SUBJECT:</strong> ${playerName}</p>
-                    <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷 (Gunshot Wound)</p>
-                    <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-                    <p><strong>OBSERVATION:</strong><br>執行者：Victor。在第三次密碼驗證失敗後執行清理程序。子彈貫穿額前，受試者即刻喪失生命體徵。</p>
-                `;
-            }, 100);
-        });
+        gunshotSFX.currentTime = 0; gunshotSFX.play();
+        setTimeout(() => {
+            document.getElementById('scare-layer').style.display = 'flex';
+            document.getElementById('death-content').innerHTML = `
+                <p><strong>SUBJECT:</strong> ${playerName}</p>
+                <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷</p>
+                <hr>
+                <p>執行者：Victor。在第三次驗證失敗後執行清理程序。子彈貫穿額前，受試者即刻死亡。</p>
+            `;
+        }, 100);
     }
 
     async function triggerDiary() {
         const doc = document.getElementById('doc');
         
-        // 1. 先播放音效
+        // 1. 播放翻頁音效
         pageSFX.play();
 
-        // 2. 徹底清空內容並加入翻頁特效 Class
-        doc.innerHTML = ""; 
-        doc.classList.add('flipping');
-        doc.style.background = "#c0c0c0"; // 稍微改變紙張顏色代表換頁
-
-        // 3. 建立日記容器
-        const diaryBox = document.createElement('div');
-        diaryBox.id = "final-diary";
-        diaryBox.style.cssText = "color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;";
-        doc.appendChild(diaryBox);
+        // 2. 徹底清空整個容器，絕不殘留 SUBJECT 等文字
+        doc.innerHTML = '<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6;"></div>';
         
+        // 3. 強制觸發 CSS 動畫
+        doc.classList.remove('flipping');
+        void doc.offsetWidth; // 強制重繪
+        doc.classList.add('flipping');
+
+        // 4. 打字機效果
         const content = [
             "【VICTOR'S PRIVATE JOURNAL】",
             "那場絕美火災是我送給 Veil 家族的『歡迎儀式』，我看著火舌吞噬宅邸就想哈哈大笑。",
@@ -224,6 +218,7 @@
             "只要他還在痛苦中掙扎，就是我最完美的標本。我真希望快點聽見他叫我『父親』。"
         ];
         
+        const diaryBox = document.getElementById('final-diary');
         for(let text of content) {
             let p = document.createElement('p'); 
             diaryBox.appendChild(p);
@@ -231,7 +226,7 @@
                 p.innerHTML += char; 
                 await new Promise(r=>setTimeout(r, 60)); 
             }
-            await new Promise(r=>setTimeout(r, 1000));
+            await new Promise(r=>setTimeout(r, 800));
         }
     }
 </script>

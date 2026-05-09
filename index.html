@@ -1,69 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_FINAL</title>
+    <title>FILE_0112_LUCA</title>
     <style>
-        :root { --paper: #f0f0f0; --ink: #111; --accent: #7a0000; }
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;600&display=swap');
+
+        :root { --paper: #f4f4f4; --ink: #1a1a1a; --accent: #800000; }
+        
         body { 
-            background: #000; color: #333; font-family: "Courier New", Courier, monospace;
+            background: #000; color: #333; font-family: 'Noto Serif TC', serif;
             margin: 0; padding: 0; overflow: hidden; height: 100vh;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 5秒呼吸幻覺 */
+        /* 呼吸動畫 */
         #breathe-txt {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5.5rem; font-weight: 900; color: rgba(255,255,255,0.03);
-            text-transform: uppercase; letter-spacing: 25px; pointer-events: none; z-index: 5000;
-            opacity: 0; filter: blur(12px);
+            font-size: 5rem; font-weight: 900; color: rgba(255,255,255,0.02);
+            text-transform: uppercase; letter-spacing: 20px; pointer-events: none; z-index: 5000;
         }
-        .breathe-on { animation: breathe-fade 2.8s ease-in-out forwards; }
+        .breathe-anim { animation: breathe-fade 3s ease-in-out forwards; }
         @keyframes breathe-fade {
-            0% { opacity: 0; filter: blur(15px); scale: 0.9; }
-            50% { opacity: 0.15; filter: blur(3px); scale: 1.05; }
-            100% { opacity: 0; filter: blur(15px); scale: 1.15; }
+            0% { opacity: 0; filter: blur(10px); }
+            50% { opacity: 0.15; filter: blur(2px); }
+            100% { opacity: 0; filter: blur(20px); }
         }
 
-        /* 醫療報告：白色掃描紙 */
-        .report-page {
-            width: 92%; max-width: 480px; height: 85vh;
-            background: var(--paper); padding: 45px 35px; box-sizing: border-box;
-            box-shadow: 0 0 50px #000; position: relative;
-            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
-            border: 1px solid #aaa; transform: rotate(-0.3deg);
-            overflow-y: auto; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 1s;
+        /* 報告紙張 */
+        .report-sheet {
+            width: 90%; max-width: 480px; height: 85vh;
+            background: var(--paper); padding: 50px 40px; box-sizing: border-box;
+            box-shadow: 0 0 60px rgba(0,0,0,1); position: relative;
+            background-image: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
+            border: 1px solid #d1d1d1; transform: rotate(-0.5deg);
+            overflow-y: auto; transition: transform 0.3s ease, filter 1s;
         }
 
-        h1 { font-size: 1.1rem; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 25px; text-transform: uppercase; text-align: center; }
-        .section { margin-bottom: 20px; font-size: 0.85rem; line-height: 1.6; text-align: justify; }
-        .label { font-weight: bold; background: #ddd; padding: 0 3px; margin-right: 5px; }
+        h1 { font-size: 1.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 30px; text-align: center; letter-spacing: 5px; color: #000; }
+        .section { margin-bottom: 25px; font-size: 0.95rem; line-height: 1.8; color: #222; }
+        .italic-content { font-style: italic; color: #444; }
+        .label { font-weight: 600; font-size: 0.75rem; color: #777; text-transform: uppercase; display: block; margin-bottom: 5px; }
 
-        /* 解密遮罩 */
+        /* 遮罩 */
         .black-out {
-            background: #111; color: transparent; padding: 0 8px; cursor: pointer; transition: 0.4s;
+            background: #000; color: transparent; padding: 0 5px; cursor: pointer; transition: 0.5s;
             border-bottom: 1px solid var(--accent);
         }
-        .active-target { animation: hint-pulse 2s infinite; }
-        @keyframes hint-pulse { 0%, 100% { background: #000; } 50% { background: #220000; } }
+        .active-hint { animation: pulse-red 2s infinite; }
+        @keyframes pulse-red { 0%, 100% { background: #000; } 50% { background: #400; } }
 
-        /* 死亡結局：視野收縮 */
+        /* 死亡遮罩 */
         #death-vignette {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(circle, transparent 100%, #000 100%);
-            z-index: 10000; pointer-events: none; transition: 2.5s ease-in;
+            z-index: 10000; pointer-events: none; transition: 2s ease-in;
         }
-        .is-dead { background: radial-gradient(circle, transparent 0%, #000 0%) !important; }
+        .death-active { background: radial-gradient(circle, transparent 0%, #000 0%) !important; }
 
-        #input-ui {
-            position: fixed; bottom: 0; width: 100%; background: #0a0a0a;
-            padding: 30px; box-sizing: border-box; display: none; z-index: 6000;
-            border-top: 2px solid var(--accent);
+        #input-box {
+            position: fixed; bottom: 0; width: 100%; background: #080808;
+            padding: 35px; box-sizing: border-box; display: none; z-index: 6000; border-top: 1px solid var(--accent);
         }
         input {
-            width: 100%; background: transparent; border: none; color: #fff;
-            font-size: 2rem; text-align: center; outline: none; letter-spacing: 10px;
+            width: 100%; background: transparent; border: none; color: #fff; font-family: serif;
+            font-size: 2.2rem; text-align: center; outline: none; letter-spacing: 12px;
+        }
+
+        /* 結局字樣 */
+        #final-msg {
+            position: fixed; z-index: 10001; color: #700; font-weight: bold; 
+            letter-spacing: 10px; font-family: serif; text-align: center; display: none;
         }
     </style>
 </head>
@@ -71,116 +79,109 @@
 
 <div id="breathe-txt">Breathe</div>
 <div id="death-vignette"></div>
+<div id="final-msg">歸檔失敗：個案意識已崩潰</div>
 
-<div id="gate" style="position:fixed; z-index:9999; width:100%; height:100%; background:#000; color:#444; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="unlock()">
-    [ ARCHIVE 0112: ENCRYPTED ]
+<div id="gate" style="position:fixed; z-index:9999; width:100%; height:100%; background:#000; color:#666; display:flex; flex-direction:column; align-items:center; justify-content:center; cursor:pointer;" onclick="init()">
+    <span>[ 點擊以檢閱 0112 號臨床檔案 ]</span>
+    <small style="margin-top:20px; font-size:0.6rem; opacity:0.5;">確保音量已開啟</small>
 </div>
 
-<div class="report-page" id="paper-doc">
-    <h1>Observation: Luca Veil</h1>
-
+<div class="report-sheet" id="doc">
+    <h1>臨床行為觀察紀錄</h1>
+    
     <div class="section">
-        <span class="label">SUBJECT:</span> 0112<br>
-        <span class="label">STATUS:</span> NON-REACTIVE / DISSOCIATIVE
+        <span class="label">Patient Name</span>
+        <span class="italic-content">盧卡．維爾 (Luca Veil) / 個案編號 0112</span>
     </div>
 
     <div class="section">
-        <span class="label">RECORD 1:</span><br>
-        Sole survivor recovered from the <span class="black-out active-target" onclick="ask('VEIL')">V _ _ L</span> estate ruins. Patient was found gripping a family crest so firmly that the metal edges severed the tendons in his palm. No pain vocalization recorded.
+        <span class="label">Background Incident</span>
+        <span class="italic-content">
+            他是 <span class="black-out active-hint" onclick="ask('VEIL')">V _ _ L</span> 莊園大火中唯一的生存者。醫護小組發現他時，他正死死握著一枚發黑的家徽扣，金屬邊緣已嵌入掌心皮肉。
+        </span>
     </div>
 
     <div class="section">
-        <span class="label">RECORD 2 (ABUSE LOG):</span><br>
-        Peers forcibly submerged the patient in a mud pit during a thunderstorm. One attacker crushed the patient's left hand under a boot, grinding it into the silt for several minutes. Patient remained in a state of suspended animation.
+        <span class="label">Physical Abuse Record</span>
+        <span class="italic-content">
+            雨中觀察紀錄：施暴者強行將個案推入泥坑，以重物（靴）反覆碾壓個案左手。即便骨骼發出悶響，個案依然維持著一種令人戰慄的寂靜，僅在重擊瞬間產生生理性眨眼。
+        </span>
     </div>
 
     <div class="section">
-        <span class="label">VERBAL ANALYSIS:</span><br>
-        Attackers stuffed mud into the patient's mouth to silence him, calling him a 
-        <span class="black-out" id="target2" onclick="ask('DOLL')">D _ _ L</span>. 
-        Exposure duration: 6 hours. Physiological response: Sluggish blinking, shivering, eyes fixed on void.
-    </div>
-
-    <div class="section" style="border-top: 1px dashed #777; padding-top:10px; color:#555; font-style:italic;">
-        Conclusion: Subject has ceased to acknowledge external stimuli. He exists only in the space between breaths.
+        <span class="label">Observation</span>
+        <span class="italic-content">
+            霸凌者將泥沙灌入其口中，稱其為 <span class="black-out" id="t2" onclick="ask('DOLL')">D _ _ L</span>。在長達六小時的寒冷曝露中，他那雙眼睛始終盯著虛無。
+        </span>
     </div>
 </div>
 
-<div id="input-ui">
-    <input type="text" id="pass-field" placeholder="...">
+<div id="input-box">
+    <input type="text" id="ans" placeholder="..." autocomplete="off">
 </div>
 
 <script>
-    // 音效資源
-    const rainSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2456/2456-preview.mp3');
-    const glitchSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3');
-    const pageSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/1474/1474-preview.mp3'); // 紙張翻頁聲
-    
-    let fails = 0; let solved = 0; let current = "";
+    // 使用新的穩定連結
+    const rainSfx = new Audio('https://www.soundjay.com/nature/rain-07.mp3');
+    const glitchSfx = new Audio('https://www.soundjay.com/communication/digital-glitch-01.mp3');
+    const paperSfx = new Audio('https://www.soundjay.com/misc/paper-flip-1.mp3');
 
-    function unlock() {
+    let fails = 0; let solved = 0; let target = "";
+
+    function init() {
         document.getElementById('gate').style.display = 'none';
-        rainSfx.loop = true; rainSfx.play(); rainSfx.volume = 0.5;
+        rainSfx.loop = true; rainSfx.play();
         
-        // 5秒呼吸動畫
+        // 5秒呼吸動畫循環
         setInterval(() => {
             const b = document.getElementById('breathe-txt');
-            b.classList.remove('breathe-on');
-            void b.offsetWidth;
-            b.classList.add('breathe-on');
+            b.classList.remove('breathe-anim');
+            void b.offsetWidth; // 強制重繪
+            b.classList.add('breathe-anim');
         }, 5000);
     }
 
     function ask(code) {
         if(fails >= 3) return;
-        current = code;
-        document.getElementById('input-ui').style.display = 'block';
-        document.getElementById('pass-field').focus();
+        target = code;
+        document.getElementById('input-box').style.display = 'block';
+        document.getElementById('ans').focus();
     }
 
-    document.getElementById('pass-field').addEventListener('keyup', e => {
+    document.getElementById('ans').addEventListener('keyup', e => {
         if(e.key === 'Enter') {
-            const inputVal = e.target.value.toUpperCase();
-            if(inputVal === current) {
-                onSuccess();
+            const val = e.target.value.toUpperCase();
+            if(val === target) {
+                paperSfx.play();
+                document.getElementById('input-box').style.display = 'none';
+                const el = Array.from(document.querySelectorAll('.black-out')).find(b => b.innerText.includes(target[0]));
+                el.innerText = target; el.style.background = "transparent"; el.style.color = "var(--accent)";
+                el.classList.remove('active-hint');
+                
+                // 解密過場：紙張抽動
+                const doc = document.getElementById('doc');
+                doc.style.transform = "rotate(0deg) scale(1.05) translateY(-10px)";
+                setTimeout(() => doc.style.transform = "rotate(-0.5deg) scale(1)", 400);
+
+                solved++;
+                if(solved === 1) document.getElementById('t2').classList.add('active-hint');
+                e.target.value = "";
             } else {
-                onFail();
+                glitchSfx.play();
+                fails++; e.target.value = "";
+                if(fails >= 3) {
+                    gameOver();
+                }
             }
         }
     });
 
-    function onSuccess() {
-        pageSfx.play(); // 觸發紙張聲
-        document.getElementById('input-ui').style.display = 'none';
-        document.getElementById('pass-field').value = "";
-        
-        const el = Array.from(document.querySelectorAll('.black-out')).find(b => b.innerText.includes(current[0]));
-        el.innerText = current;
-        el.style.background = "transparent";
-        el.style.color = "var(--accent)";
-        el.classList.remove('active-target');
-
-        // 紙張微動特效
-        const doc = document.getElementById('paper-doc');
-        doc.style.transform = "rotate(0deg) scale(1.02)";
-        setTimeout(() => doc.style.transform = "rotate(-0.3deg) scale(1)", 500);
-
-        solved++;
-        if(solved === 1) document.getElementById('target2').classList.add('active-target');
-        if(solved === 2) doc.style.filter = "sepia(0.5) contrast(1.2)";
-    }
-
-    function onFail() {
-        glitchSfx.play();
-        fails++;
-        document.getElementById('pass-field').value = "";
-        if(fails >= 3) {
-            document.getElementById('input-ui').style.display = 'none';
-            document.getElementById('death-vignette').classList.add('is-dead');
-            setTimeout(() => {
-                document.body.innerHTML = "<div style='color:#700; text-align:center; margin-top:45vh; font-weight:bold; letter-spacing:10px;'>SESSION TERMINATED.</div>";
-            }, 2500);
-        }
+    function gameOver() {
+        document.getElementById('input-box').style.display = 'none';
+        document.getElementById('death-vignette').classList.add('death-active');
+        setTimeout(() => {
+            document.getElementById('final-msg').style.display = 'block';
+        }, 1500);
     }
 </script>
 </body>

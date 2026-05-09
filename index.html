@@ -9,87 +9,84 @@
         :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        #watcher-bg {
+        /* 命名區 */
+        #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1.5s; }
+        .name-box { border: none; background: none; border-bottom: 2px solid #333; color: #fff; font-size: 1.5rem; text-align: center; font-family: serif; outline: none; padding: 10px; width: 280px; letter-spacing: 2px; }
+        .name-box:focus { border-bottom-color: #800; }
+
+        /* 開場畫面 */
+        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        #poem-area { line-height: 3; letter-spacing: 5px; color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.7); text-align: center; font-style: italic; padding: 40px; font-size: 1.1rem; }
+
+        /* 報告書 */
+        .report-sheet { 
+            width: 92%; max-width: 500px; height: 88vh; background: var(--paper); 
+            padding: 35px 25px; box-sizing: border-box; display: none; color: var(--ink); 
+            position: relative; z-index: 5; margin: 6vh auto; overflow-y: auto;
+            box-shadow: 0 0 80px #000; border: 1px solid #999;
+        }
+
+        /* 眼球結局背景 */
+        #eye-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/contain no-repeat #000; 
-            opacity: 0; transition: opacity 8s ease-in-out; z-index: 1;
-            filter: brightness(0.4) contrast(1.5);
+            opacity: 0; transition: opacity 5s ease-in; z-index: 1; pointer-events: none;
+            filter: grayscale(1) contrast(2) brightness(0.5);
         }
 
-        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 1s; }
-        #poem-area { line-height: 2.5; letter-spacing: 3px; color: #aaa; text-shadow: 0 0 10px rgba(255,255,255,0.2); text-align: center; font-style: italic; padding: 20px; font-size: 0.9rem; min-height: 200px; }
+        /* 遮擋塊 */
+        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 5px; border-bottom: 2px solid #555; transition: 0.3s; }
 
-        .report-sheet { 
-            width: 90%; max-width: 500px; height: 85vh; background: var(--paper); 
-            padding: 40px 30px; box-sizing: border-box; display: none; color: var(--ink); 
-            position: relative; z-index: 5; transition: 2s; overflow-y: auto;
-            box-shadow: 0 0 60px #000;
-        }
-        .report-sheet.burned { background: #070707 !important; color: #b30000 !important; border: 1px solid #300; }
+        /* 結局層 */
+        #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #000; display: none; align-items: center; justify-content: center; }
+        .death-paper { width: 85%; max-width: 380px; background: #eee; color: #111; padding: 40px 30px; border: 10px double #400; line-height: 1.8; }
+        .gun-flash { position: fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:100001; display:none; }
 
-        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: #1a120b; z-index: 999; transition: 2.5s ease-in; opacity: 0.98; }
+        #input-panel { position: fixed; bottom: 0; width: 100%; background: #0d0d0d; padding: 30px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid #800; }
+        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2rem; outline: none; font-family: serif; }
 
-        /* 黑色遮擋塊：精確模擬字數 */
-        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 2px; transition: 0.3s; border-bottom: 1px solid #555; user-select: none; font-family: monospace; }
-        .active-hint { background: #400; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-
-        #final-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 10000; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
-            color: #700; text-align: center; padding: 20px; cursor: pointer;
-        }
-
-        #input-panel { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; padding: 35px; box-sizing: border-box; display: none; z-index: 2000; border-top: 1px solid var(--accent); }
-        input { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2.2rem; outline: none; font-family: serif; }
-        
-        .cursor { display: inline-block; width: 10px; height: 1.2em; background: #b00; margin-left: 5px; animation: blink 1s infinite; vertical-align: middle; }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        h1 { font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center; margin-top: 0; }
-        h2 { font-size: 0.85rem; margin-top: 25px; border-left: 4px solid #800; padding-left: 10px; font-weight: bold; }
-        p { font-size: 0.8rem; line-height: 1.8; text-align: justify; margin: 12px 0; }
-        .classified-meta { font-size: 0.7rem; color: #444; margin-bottom: 5px; }
+        h1 { font-size: 1.1rem; border-bottom: 2px solid #333; padding-bottom: 15px; text-align: center; }
+        h2 { font-size: 0.9rem; margin-top: 20px; border-left: 5px solid #800; padding-left: 10px; }
     </style>
 </head>
-<body onclick="handleInteraction()">
+<body>
 
-<div id="watcher-bg"></div>
-<div id="mud-up"></div>
+<div id="eye-bg"></div>
 
-<div id="final-overlay">
-    <h2 id="final-title" style="letter-spacing: 12px; border:none;"></h2>
-    <p id="final-sub" style="font-size: 0.95rem; color: #444; text-align:center;"></p>
+<div id="name-gate">
+    <div style="color: #888; letter-spacing: 5px; margin-bottom: 30px; font-size: 0.8rem;">IDENTIFY YOURSELF TO PROCEED</div>
+    <input type="text" id="user-name" class="name-box" maxlength="12" spellcheck="false" autocomplete="off">
+    <div style="color: #400; font-size: 0.7rem; margin-top: 25px; letter-spacing: 3px;">[ PRESS ENTER ]</div>
 </div>
 
 <div id="gate-screen">
     <div id="poem-area"></div>
-    <div id="click-prompt" style="color:#444; font-size:0.7rem; letter-spacing:5px; margin-top:20px;">[ CLICK TO WITNESS ]</div>
+    <div id="click-prompt" style="color:#fff; font-size:0.8rem; letter-spacing:10px; margin-top:40px; opacity:0.6;">[ CLICK TO WITNESS ]</div>
 </div>
 
-<div class="report-sheet" id="doc">
+<div class="report-sheet" id="doc" onmousemove="resetIdle()" onclick="resetIdle()" onkeypress="resetIdle()">
     <div id="report-header">
-        <div class="stamp" style="position:absolute; border:3px solid #800; color:#800; padding:5px 10px; font-weight:bold; transform:rotate(-15deg); opacity:0.6; font-size:0.8rem; top:30px; right:30px;">CLASSIFIED</div>
-        <div class="classified-meta">檔案狀態： 極機密 (CLASSIFIED)</div>
-        <div class="classified-meta">權限層級： Level 4</div>
+        <div style="position:absolute; border:3px solid #800; color:#800; padding:5px 10px; font-weight:bold; transform:rotate(-15deg); opacity:0.6; font-size:0.8rem; top:30px; right:20px;">CLASSIFIED</div>
         <h1>臨床行為觀測報告：0112 號</h1>
     </div>
     
     <div id="doc-content">
         <p><strong>觀測對象：</strong> Luca (Surname: <span style="background:#1a1a1a;color:#1a1a1a">Veil</span>)</p>
 
-        <h2>一、 現場觀測紀錄：暴力行為</h2>
-        <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖，瞳孔呈現持續性放大。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背，在混濁的泥濘中反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救，其意識已進入深層解離狀態。</p>
-        <p>施暴者在過程中不斷重複「燒焦的孤兒」等字眼，並宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">████</span>。</p>
+        <h2>一、 現場觀測紀錄：肢體與精神損毀</h2>
+        <p>個案在搬運過程中未表現出掙扎，瞳孔持續性放大。施暴者將其推入泥坑，領頭者踩住左手背反覆碾壓。當掌骨發出明顯的<strong>摩擦聲與悶響</strong>時，個案並未尖叫。分析判定個案已進入深層解離狀態，徹底切斷痛覺感知。</p>
+        <p>施暴者宣稱其僅是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" onclick="openInput('DOLL')">████</span>。</p>
 
-        <h2>二、 關鍵物證：血染的家徽</h2>
-        <p>在長達六小時的受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。經掃描，該扣具上刻有顯眼的 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">█</span> 字標記。儘管扣子邊緣因受壓而嵌入肉內，指縫滲出混著泥水的血跡，個案仍未鬆手。這枚家徽扣被視為連結個案原始家族（Veil）身世的唯一實體殘留。</p>
+        <h2>二、 關鍵物證：血染的家徽殘骸</h2>
+        <p>在長達<strong>六小時</strong>的受暴中，個案始終死捏著一枚家徽扣。扣具上刻有顯眼的 <span class="input-gap" onclick="openInput('V')">█</span> 字標記。儘管邊緣嵌入肉內導致指縫滲血，個案仍未鬆手。</p>
 
         <h2>三、 背景分析：收養與監視</h2>
-        <p>個案在火災事故後，由名為 <span class="input-gap" id="gap-VICTOR" onclick="openInput('VICTOR')">██████</span> 的男子迅速介入並取得收養權。該男子將個案安置在高度封閉的環境中，似乎在監視個案是否會憶起火災當晚的真相。</p>
-
-        <div id="official-footer" style="margin-top: 30px; font-size: 0.75rem; border-top: 1px dashed #999; padding-top: 10px; text-align: right;">簽署： 臨床二等觀測員 (7109-B)</div>
+        <p>火災後，由名為 <span class="input-gap" onclick="openInput('VICTOR')">██████</span> 的男子迅速取得收養權。該男子似乎在監視個案是否會因極端刺激而憶起真相。</p>
+        
+        <div style="margin-top: 40px; font-size: 0.75rem; border-top: 1px dashed #999; padding-top: 10px; text-align: right;">
+            簽署： 臨床二等觀測員 (7109-B)<br>
+            <span style="color:#800">處置建議：嚴禁介入，直至樣本損毀</span>
+        </div>
     </div>
 </div>
 
@@ -97,71 +94,107 @@
     <input type="text" id="pass-field" placeholder="..." autocomplete="off">
 </div>
 
+<div id="scare-layer">
+    <div id="death-paper" class="death-paper"></div>
+</div>
+<div id="gun-flash" class="gun-flash"></div>
+
 <script>
-    const lines = ["The fire consumes the secret's pale,", "Lifting up the crimson Veil.", "A single letter etched in steel,", "Is all the truth he'll ever feel."];
-    let started = false, solved = {V:false, DOLL:false, VICTOR:false}, errors = 0, audioCtx;
+    let playerName = "";
+    let solved = {V:false, DOLL:false, VICTOR:false};
+    let errors = 0;
+    let audioCtx;
+    let idleTimer;
+    const IDLE_LIMIT = 18000; // 18秒
 
-    function handleInteraction() {
-        if (!started) { 
-            started = true; 
-            document.getElementById('click-prompt').style.opacity = '0'; 
-            initAudio(); 
-            startTypewriter(); 
-        }
-    }
-
-    async function initAudio() {
+    function initAudio() {
+        if (audioCtx) return;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-
-        // 背景雨聲 (低頻噪音)
-        const bufferSize = audioCtx.sampleRate * 2;
-        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 2, audioCtx.sampleRate);
         const output = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+        for (let i = 0; i < noiseBuffer.length; i++) output[i] = Math.random() * 2 - 1;
         const noise = audioCtx.createBufferSource();
         noise.buffer = noiseBuffer; noise.loop = true;
-        const filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass'; filter.frequency.value = 600;
-        const rainGain = audioCtx.createGain(); rainGain.gain.value = 0.12;
-        noise.connect(filter); filter.connect(rainGain); rainGain.connect(audioCtx.destination);
+        const gain = audioCtx.createGain(); gain.gain.value = 0.12;
+        noise.connect(gain); gain.connect(audioCtx.destination);
         noise.start();
     }
 
-    function playTypeSound(freq = 150, vol = 0.05) {
+    function playSfx(freq, vol, dur, type = 'triangle') {
         if(!audioCtx) return;
         const osc = audioCtx.createOscillator();
         const g = audioCtx.createGain();
-        osc.type = 'triangle'; 
-        osc.frequency.setValueAtTime(freq + (Math.random() * 50), audioCtx.currentTime);
+        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         g.gain.setValueAtTime(vol, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
         osc.connect(g); g.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
     }
 
-    async function startTypewriter() {
-        const area = document.getElementById('poem-area');
-        for (let line of lines) {
-            for (let char of line) { 
-                area.innerHTML += char; 
-                playTypeSound(400, 0.02); 
-                await new Promise(r => setTimeout(r, 80)); 
-            }
-            area.innerHTML += "<br>"; await new Promise(r => setTimeout(r, 450));
+    async function typeText(element, text, speed = 80, freq = 400) {
+        for (let char of text) {
+            element.innerHTML += char;
+            playSfx(freq + Math.random()*100, 0.03, 0.1);
+            await new Promise(r => setTimeout(r, speed));
         }
-        setTimeout(() => { 
-            document.getElementById('gate-screen').style.opacity = '0'; 
-            setTimeout(() => { 
-                document.getElementById('gate-screen').style.display = 'none'; 
-                document.getElementById('doc').style.display = 'block';
-                playTypeSound(100, 0.2); // 模擬文件攤開聲
-            }, 1000); 
-        }, 1000);
     }
 
+    // 命名與進入
+    document.getElementById('user-name').addEventListener('keypress', async (e) => {
+        if(e.key === 'Enter' && e.target.value.trim() !== "") {
+            playerName = e.target.value.trim();
+            initAudio();
+            document.getElementById('name-gate').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('name-gate').style.display = 'none';
+                document.getElementById('gate-screen').style.display = 'flex';
+                startPoem();
+            }, 1500);
+        }
+    });
+
+    async function startPoem() {
+        const area = document.getElementById('poem-area');
+        const lines = ["The fire consumes the secret's pale,", "Lifting up the crimson Veil.", "A single letter etched in steel,", "Is all the truth he'll ever feel."];
+        for(let line of lines) {
+            let div = document.createElement('div');
+            area.appendChild(div);
+            await typeText(div, line, 60, 500);
+            await new Promise(r => setTimeout(r, 600));
+        }
+    }
+
+    document.getElementById('gate-screen').onclick = () => {
+        if(document.getElementById('poem-area').children.length >= 4) {
+            document.getElementById('gate-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('gate-screen').style.display = 'none';
+                document.getElementById('doc').style.display = 'block';
+                playSfx(100, 0.4, 0.6, 'square');
+                resetIdle(); // 開始計時 18 秒
+            }, 1000);
+        }
+    };
+
+    // 閒置結局邏輯
+    function resetIdle() {
+        if (document.getElementById('doc').style.display !== 'block') return;
+        clearTimeout(idleTimer);
+        document.getElementById('eye-bg').style.opacity = '0';
+        idleTimer = setTimeout(triggerEyeDeath, IDLE_LIMIT);
+    }
+
+    function triggerEyeDeath() {
+        document.getElementById('eye-bg').style.opacity = '1';
+        document.getElementById('doc').style.filter = 'blur(10px) brightness(0.2)';
+        playSfx(60, 0.5, 5, 'sine'); // 低頻嗡鳴
+        setTimeout(() => {
+            document.body.innerHTML = "<div style='color:#300; display:flex; align-items:center; justify-content:center; height:100vh; font-size:1.2rem; letter-spacing:10px; text-shadow:0 0 10px #f00;'>THE GAZER IS WATCHING YOU</div>";
+        }, 5000);
+    }
+
+    // 解謎功能
     function openInput(id) {
-        if ((id === 'DOLL' && !solved.V) || (id === 'VICTOR' && !solved.DOLL)) return;
         document.getElementById('input-panel').style.display = 'block';
         document.getElementById('pass-field').focus();
         window.targetKey = id;
@@ -171,67 +204,53 @@
         if (e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
             if (val === window.targetKey) {
-                const target = document.getElementById('gap-' + window.targetKey);
-                target.innerText = window.targetKey;
-                target.style.background = "none"; target.style.color = "#800";
-                target.style.fontWeight = "bold";
                 solved[window.targetKey] = true;
-                playTypeSound(200, 0.1);
-                if (solved.V) document.getElementById('gap-DOLL').classList.add('active-hint');
-                if (solved.DOLL) document.getElementById('gap-VICTOR').classList.add('active-hint');
-                if (solved.VICTOR) triggerFinal("真相已解鎖", "點擊閱讀 Victor 的告解日記", "SUCCESS");
+                playSfx(250, 0.2, 0.2);
+                if (solved.V && solved.DOLL && solved.VICTOR) {
+                    clearTimeout(idleTimer);
+                    triggerDiary();
+                }
             } else {
-                errors++; if (errors >= 3) triggerFinal("ACCESS DENIED", "系統已自動鎖定。", "DEATH");
+                errors++;
+                if (errors >= 5) triggerDeath();
             }
-            document.getElementById('input-panel').style.display = 'none'; e.target.value = "";
+            document.getElementById('input-panel').style.display = 'none';
+            e.target.value = "";
         }
     });
 
-    function triggerFinal(title, sub, type) {
-        if (type === "DEATH") document.getElementById('mud-up').style.bottom = '0';
-        if (type === "SUCCESS") {
-            document.getElementById('doc').classList.add('burned');
-            document.getElementById('final-overlay').onclick = () => runDiary();
-        }
-        setTimeout(() => {
-            document.getElementById('final-title').innerText = title;
-            document.getElementById('final-sub').innerText = sub;
-            document.getElementById('final-overlay').style.display = 'flex';
-        }, 1200);
+    // 處決結局
+    function triggerDeath() {
+        clearTimeout(idleTimer);
+        const flash = document.getElementById('gun-flash');
+        const paper = document.getElementById('death-paper');
+        playSfx(40, 1.0, 1.2, 'sawtooth');
+        flash.style.display = 'block';
+        setTimeout(() => flash.style.display = 'none', 100);
+
+        document.getElementById('scare-layer').style.display = 'flex';
+        paper.innerHTML = `
+            <h1 style="color:#800">DEATH REPORT</h1>
+            <p><strong>SUBJECT:</strong> ${playerName}</p>
+            <p><strong>EXECUTOR:</strong> Killian Theodore</p>
+            <p><strong>CAUSE:</strong> Gunshot Wound (Unauthorized Access)</p>
+            <hr>
+            <p>系統攔截成功。Killian Theodore 已執行清理程序。連接已斷開。</p>
+        `;
+        setTimeout(() => paper.style.display = 'block', 400);
     }
 
-    async function runDiary() {
-        document.getElementById('final-overlay').style.display = 'none';
-        document.getElementById('report-header').style.display = 'none';
-        document.getElementById('official-footer').style.display = 'none';
-        const content = document.getElementById('doc-content');
-        content.innerHTML = `<div id="typer-box" style="color:#b00; font-family:serif; line-height:2.4; font-size:0.95rem;"></div>`;
-        
-        const diaryText = [
-            " [ 19XX.07.12 - 火災當晚 ]",
-            "那晚的熱浪比我想像中更迷人。我看著火舌舔舐著宅邸，聽著那些高高在上的慘叫聲，心中竟有一種久違的平靜。",
-            "我看見那個孩子在濃煙中掙扎，手裡抓著那枚家徽扣，眼神裡充滿了瀕死動物才有的純粹恐懼。在那一刻，我決定留下他。",
-            "不是因為憐憫。我留下他，是因為他是這場大火中唯一倖存的證物。我想看看，親手點燃大火的人，如果成為他最後的救命稻草，這場戲碼會多麼有趣。",
-            "\n [ 19XX.09.05 - 收養第一年 ]",
-            "他現在稱呼我為『父親』。多麼諷刺。",
-            "他不知道是我親手毀掉了他的家族。每當他用那雙充滿依賴的眼睛看著我時，我都在想，如果他知道真相，表情會如何崩潰？",
-            "我想測試，在謊言堆砌的愛中，這朵灰燼裡爬出來的花，究竟能被扭曲到什麼程度。他是我最完美的實驗品。",
-            "\n [ 實驗結論 ]",
-            "他的精神狀態越來越脆弱，這很好。",
-            "如果他能承受這份真相，他才有資格成為繼承者。否則，他只是另一個被燒焦的廢物。"
-        ];
-
-        const box = document.getElementById('typer-box');
-        for (let line of diaryText) {
-            let p = document.createElement('p'); p.style.margin = "15px 0"; box.appendChild(p);
-            for (let char of line) {
-                p.innerHTML += char; 
-                playTypeSound(150, 0.04); 
-                await new Promise(r => setTimeout(r, 70));
-            }
-            await new Promise(r => setTimeout(r, 600));
+    async function triggerDiary() {
+        document.getElementById('doc').style.background = "#080808";
+        document.getElementById('doc').style.color = "#b00";
+        const box = document.getElementById('doc-content');
+        box.innerHTML = `<div id="final-diary"></div>`;
+        const logs = ["那晚的熱浪迷人...我殺了他全家，他卻叫我父親。", "如果他承擔不住真相，他只是另一個被燒焦的廢物。"];
+        for(let log of logs) {
+            let p = document.createElement('p'); box.appendChild(p);
+            await typeText(p, log, 70, 150);
+            await new Promise(r => setTimeout(r, 800));
         }
-        box.innerHTML += '<span class="cursor"></span>';
     }
 </script>
 </body>

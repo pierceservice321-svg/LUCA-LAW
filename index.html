@@ -16,14 +16,8 @@
             filter: brightness(0.4) contrast(1.5);
         }
 
-        /* 調亮後的開場文字區域 */
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 1s; }
-        #poem-area { 
-            line-height: 2.5; letter-spacing: 3px; 
-            color: #aaa; /* 調亮文字顏色 */
-            text-shadow: 0 0 10px rgba(255,255,255,0.2); /* 增加輕微光暈 */
-            text-align: center; font-style: italic; padding: 20px; font-size: 0.9rem; min-height: 200px; 
-        }
+        #poem-area { line-height: 2.5; letter-spacing: 3px; color: #aaa; text-shadow: 0 0 10px rgba(255,255,255,0.2); text-align: center; font-style: italic; padding: 20px; font-size: 0.9rem; min-height: 200px; }
 
         .report-sheet { 
             width: 90%; max-width: 500px; height: 85vh; background: var(--paper); 
@@ -33,9 +27,10 @@
         }
         .report-sheet.burned { background: #070707 !important; color: #b30000 !important; border: 1px solid #300; }
 
-        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: #1a120b; z-index: 999; transition: 2s ease-in; opacity: 0.98; }
+        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: #1a120b; z-index: 999; transition: 2.5s ease-in; opacity: 0.98; }
 
-        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 2px; transition: 0.3s; border-bottom: 1px solid #555; user-select: none; }
+        /* 黑色遮擋塊：精確模擬字數 */
+        .input-gap { background: #1a1a1a; color: #1a1a1a; cursor: pointer; padding: 0 2px; transition: 0.3s; border-bottom: 1px solid #555; user-select: none; font-family: monospace; }
         .active-hint { background: #400; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
@@ -52,9 +47,10 @@
         .cursor { display: inline-block; width: 10px; height: 1.2em; background: #b00; margin-left: 5px; animation: blink 1s infinite; vertical-align: middle; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        h1 { font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center; }
-        h2 { font-size: 0.9rem; margin-top: 25px; border-left: 4px solid #800; padding-left: 10px; }
-        p { font-size: 0.85rem; line-height: 1.8; text-align: justify; }
+        h1 { font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center; margin-top: 0; }
+        h2 { font-size: 0.85rem; margin-top: 25px; border-left: 4px solid #800; padding-left: 10px; font-weight: bold; }
+        p { font-size: 0.8rem; line-height: 1.8; text-align: justify; margin: 12px 0; }
+        .classified-meta { font-size: 0.7rem; color: #444; margin-bottom: 5px; }
     </style>
 </head>
 <body onclick="handleInteraction()">
@@ -75,17 +71,24 @@
 <div class="report-sheet" id="doc">
     <div id="report-header">
         <div class="stamp" style="position:absolute; border:3px solid #800; color:#800; padding:5px 10px; font-weight:bold; transform:rotate(-15deg); opacity:0.6; font-size:0.8rem; top:30px; right:30px;">CLASSIFIED</div>
+        <div class="classified-meta">檔案狀態： 極機密 (CLASSIFIED)</div>
+        <div class="classified-meta">權限層級： Level 4</div>
         <h1>臨床行為觀測報告：0112 號</h1>
     </div>
     
     <div id="doc-content">
-        <p><strong>觀測對象：</strong> Luca (Surname: Veil?)</p>
-        <h2>一、 現場觀測紀錄</h2>
-        <p>施暴者宣稱其僅是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">&nbsp;&nbsp;████&nbsp;&nbsp;</span>。</p>
-        <h2>二、 關鍵物證</h2>
-        <p>扣具上刻有顯眼的 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">&nbsp;█&nbsp;</span> 字標記。</p>
-        <h2>三、 背景分析：收養與縱火疑雲</h2>
-        <p>名為 <span class="input-gap" id="gap-VICTOR" onclick="openInput('VICTOR')">&nbsp;&nbsp;██████&nbsp;&nbsp;</span> 的男子迅速取得收養權。該男子曾出現在火場監控盲點。</p>
+        <p><strong>觀測對象：</strong> Luca (Surname: <span style="background:#1a1a1a;color:#1a1a1a">Veil</span>)</p>
+
+        <h2>一、 現場觀測紀錄：暴力行為</h2>
+        <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖，瞳孔呈現持續性放大。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背，在混濁的泥濘中反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救，其意識已進入深層解離狀態。</p>
+        <p>施暴者在過程中不斷重複「燒焦的孤兒」等字眼，並宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">████</span>。</p>
+
+        <h2>二、 關鍵物證：血染的家徽</h2>
+        <p>在長達六小時的受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。經掃描，該扣具上刻有顯眼的 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">█</span> 字標記。儘管扣子邊緣因受壓而嵌入肉內，指縫滲出混著泥水的血跡，個案仍未鬆手。這枚家徽扣被視為連結個案原始家族（Veil）身世的唯一實體殘留。</p>
+
+        <h2>三、 背景分析：收養與監視</h2>
+        <p>個案在火災事故後，由名為 <span class="input-gap" id="gap-VICTOR" onclick="openInput('VICTOR')">██████</span> 的男子迅速介入並取得收養權。該男子將個案安置在高度封閉的環境中，似乎在監視個案是否會憶起火災當晚的真相。</p>
+
         <div id="official-footer" style="margin-top: 30px; font-size: 0.75rem; border-top: 1px dashed #999; padding-top: 10px; text-align: right;">簽署： 臨床二等觀測員 (7109-B)</div>
     </div>
 </div>
@@ -99,33 +102,62 @@
     let started = false, solved = {V:false, DOLL:false, VICTOR:false}, errors = 0, audioCtx;
 
     function handleInteraction() {
-        if (!started) { started = true; document.getElementById('click-prompt').style.opacity = '0'; initAudio(); startTypewriter(); }
+        if (!started) { 
+            started = true; 
+            document.getElementById('click-prompt').style.opacity = '0'; 
+            initAudio(); 
+            startTypewriter(); 
+        }
+    }
+
+    async function initAudio() {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        // 背景雨聲 (低頻噪音)
+        const bufferSize = audioCtx.sampleRate * 2;
+        const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+        const noise = audioCtx.createBufferSource();
+        noise.buffer = noiseBuffer; noise.loop = true;
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass'; filter.frequency.value = 600;
+        const rainGain = audioCtx.createGain(); rainGain.gain.value = 0.12;
+        noise.connect(filter); filter.connect(rainGain); rainGain.connect(audioCtx.destination);
+        noise.start();
+    }
+
+    function playTypeSound(freq = 150, vol = 0.05) {
+        if(!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle'; 
+        osc.frequency.setValueAtTime(freq + (Math.random() * 50), audioCtx.currentTime);
+        g.gain.setValueAtTime(vol, audioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+        osc.connect(g); g.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
     }
 
     async function startTypewriter() {
         const area = document.getElementById('poem-area');
         for (let line of lines) {
-            for (let char of line) { area.innerHTML += char; playTypeSound(400); await new Promise(r => setTimeout(r, 70)); }
-            area.innerHTML += "<br>"; await new Promise(r => setTimeout(r, 400));
+            for (let char of line) { 
+                area.innerHTML += char; 
+                playTypeSound(400, 0.02); 
+                await new Promise(r => setTimeout(r, 80)); 
+            }
+            area.innerHTML += "<br>"; await new Promise(r => setTimeout(r, 450));
         }
-        setTimeout(() => { document.getElementById('gate-screen').style.opacity = '0'; setTimeout(() => { document.getElementById('gate-screen').style.display = 'none'; document.getElementById('doc').style.display = 'block'; }, 1000); }, 1000);
-    }
-
-    function initAudio() {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-
-    // 通用的敲擊聲
-    function playTypeSound(freqBase = 150) {
-        if(!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freqBase + Math.random() * 50, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        setTimeout(() => { 
+            document.getElementById('gate-screen').style.opacity = '0'; 
+            setTimeout(() => { 
+                document.getElementById('gate-screen').style.display = 'none'; 
+                document.getElementById('doc').style.display = 'block';
+                playTypeSound(100, 0.2); // 模擬文件攤開聲
+            }, 1000); 
+        }, 1000);
     }
 
     function openInput(id) {
@@ -141,13 +173,15 @@
             if (val === window.targetKey) {
                 const target = document.getElementById('gap-' + window.targetKey);
                 target.innerText = window.targetKey;
-                target.style.background = "none"; target.style.color = "inherit";
+                target.style.background = "none"; target.style.color = "#800";
+                target.style.fontWeight = "bold";
                 solved[window.targetKey] = true;
+                playTypeSound(200, 0.1);
                 if (solved.V) document.getElementById('gap-DOLL').classList.add('active-hint');
                 if (solved.DOLL) document.getElementById('gap-VICTOR').classList.add('active-hint');
-                if (solved.VICTOR) triggerFinal("真相解鎖：[私人隨筆]", "點擊閱讀加密內容", "SUCCESS");
+                if (solved.VICTOR) triggerFinal("真相已解鎖", "點擊閱讀 Victor 的告解日記", "SUCCESS");
             } else {
-                errors++; if (errors >= 3) triggerFinal("CONNECTION LOST", "記憶已封鎖。", "DEATH");
+                errors++; if (errors >= 3) triggerFinal("ACCESS DENIED", "系統已自動鎖定。", "DEATH");
             }
             document.getElementById('input-panel').style.display = 'none'; e.target.value = "";
         }
@@ -163,7 +197,7 @@
             document.getElementById('final-title').innerText = title;
             document.getElementById('final-sub').innerText = sub;
             document.getElementById('final-overlay').style.display = 'flex';
-        }, 1500);
+        }, 1200);
     }
 
     async function runDiary() {
@@ -171,31 +205,33 @@
         document.getElementById('report-header').style.display = 'none';
         document.getElementById('official-footer').style.display = 'none';
         const content = document.getElementById('doc-content');
-        content.innerHTML = `<div id="typer-box" style="color:#b00; font-family:serif; line-height:2.2; font-size:0.95rem;"></div>`;
+        content.innerHTML = `<div id="typer-box" style="color:#b00; font-family:serif; line-height:2.4; font-size:0.95rem;"></div>`;
         
         const diaryText = [
             " [ 19XX.07.12 - 火災當晚 ]",
-            "那晚的熱浪比我想像中更迷人。我看著火舌舔舐著宅邸，聽著那些高高在上的慘叫聲。",
-            "我決定留下那個孩子。不是因為憐憫，而是因為他眼裡的恐懼是完美的素材。",
+            "那晚的熱浪比我想像中更迷人。我看著火舌舔舐著宅邸，聽著那些高高在上的慘叫聲，心中竟有一種久違的平靜。",
+            "我看見那個孩子在濃煙中掙扎，手裡抓著那枚家徽扣，眼神裡充滿了瀕死動物才有的純粹恐懼。在那一刻，我決定留下他。",
+            "不是因為憐憫。我留下他，是因為他是這場大火中唯一倖存的證物。我想看看，親手點燃大火的人，如果成為他最後的救命稻草，這場戲碼會多麼有趣。",
             "\n [ 19XX.09.05 - 收養第一年 ]",
             "他現在稱呼我為『父親』。多麼諷刺。",
-            "他不知道是我點燃了那場火，毀掉了他的 Veil 家族。",
-            "我想測試，在謊言堆砌的愛中，這朵灰燼裡的花能被扭曲到什麼程度。",
+            "他不知道是我親手毀掉了他的家族。每當他用那雙充滿依賴的眼睛看著我時，我都在想，如果他知道真相，表情會如何崩潰？",
+            "我想測試，在謊言堆砌的愛中，這朵灰燼裡爬出來的花，究竟能被扭曲到什麼程度。他是我最完美的實驗品。",
             "\n [ 實驗結論 ]",
-            "他對我的依賴越深，實驗就越成功。",
+            "他的精神狀態越來越脆弱，這很好。",
             "如果他能承受這份真相，他才有資格成為繼承者。否則，他只是另一個被燒焦的廢物。"
         ];
 
         const box = document.getElementById('typer-box');
         for (let line of diaryText) {
-            let p = document.createElement('p'); p.style.margin = "12px 0"; box.appendChild(p);
+            let p = document.createElement('p'); p.style.margin = "15px 0"; box.appendChild(p);
             for (let char of line) {
-                p.innerHTML += char; playTypeSound(150);
-                await new Promise(r => setTimeout(r, 60));
+                p.innerHTML += char; 
+                playTypeSound(150, 0.04); 
+                await new Promise(r => setTimeout(r, 70));
             }
             await new Promise(r => setTimeout(r, 600));
         }
-        p.innerHTML += '<span class="cursor"></span>';
+        box.innerHTML += '<span class="cursor"></span>';
     }
 </script>
 </body>

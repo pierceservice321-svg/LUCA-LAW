@@ -2,105 +2,193 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>⚖️ LUCA // 靈魂審訊室</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FILE_0112_DECODING</title>
     <style>
-        :root { --main-white: #ffffff; --dark-grey: #1a1a1a; }
-        body { background: #000; color: var(--main-white); font-family: 'PingFang TC', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
-        .office { width: 90%; max-width: 500px; border: 1px solid #333; padding: 40px; background: #050505; position: relative; box-shadow: 0 0 60px rgba(0,0,0,1); }
-        .case-header { font-size: 0.7rem; color: #444; letter-spacing: 2px; border-bottom: 1px solid #222; margin-bottom: 30px; padding-bottom: 10px; }
-        #dialogue { min-height: 140px; font-size: 1.15rem; line-height: 1.7; margin-bottom: 40px; color: #ddd; }
-        .options-container { display: flex; flex-direction: column; gap: 12px; }
-        .option-btn { background: transparent; color: #888; border: 1px solid #333; padding: 15px; cursor: pointer; text-align: left; transition: 0.2s; font-size: 1rem; border-radius: 2px; display: flex; align-items: center; }
-        .option-btn:hover { border-color: var(--main-white); color: var(--main-white); background: rgba(255,255,255,0.05); }
-        .option-prefix { font-weight: bold; margin-right: 15px; color: #555; }
-        .debt-panel { position: fixed; top: 30px; left: 30px; font-family: monospace; }
-        .debt-label { font-size: 0.7rem; color: #444; }
-        .debt-value { color: #ff3b3b; font-size: 1.2rem; }
+        :root { --paper: #f4f1ea; --ink: #222; --accent: #b00; }
+        body { 
+            background: #000; color: #dcdcdc; font-family: 'Courier New', Courier, monospace;
+            margin: 0; padding: 0; overflow: hidden; height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        /* 啟動遮罩 */
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 1000; display: flex; 
+            align-items: center; justify-content: center; text-align: center;
+        }
+
+        /* 檔案卡片 */
+        .file-container { width: 100%; height: 80vh; position: relative; perspective: 1000px; }
+        .file-page {
+            width: 85%; max-width: 350px; height: 100%;
+            background: var(--paper); color: var(--ink);
+            margin: 0 auto; padding: 30px; box-sizing: border-box;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.8);
+            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+            transition: 0.5s transform, 0.5s opacity;
+            border-radius: 2px; overflow-y: auto; border-left: 10px solid #ccc;
+        }
+        .file-page.hidden { opacity: 0; pointer-events: none; transform: translate(-50%, -50%) rotateY(15deg); }
+
+        h2 { font-size: 1.1rem; border-bottom: 2px solid var(--ink); padding-bottom: 5px; margin-top: 0; }
+        p { font-size: 0.95rem; line-height: 1.8; margin: 15px 0; }
+
+        /* 黑色抹除區 */
+        .black-out {
+            background: #000; color: #000; cursor: pointer;
+            padding: 2px 8px; transition: 0.3s; user-select: none;
+            display: inline-block; border-radius: 2px;
+        }
+
+        /* 手機輸入區 */
+        #input-box {
+            position: fixed; bottom: 0; width: 100%; background: #111;
+            padding: 20px; box-sizing: border-box; display: none; z-index: 500;
+            border-top: 2px solid var(--accent);
+        }
+        input {
+            width: 100%; background: transparent; border: none;
+            color: var(--accent); font-size: 1.8rem; text-align: center; outline: none;
+            font-family: 'Courier New', Courier, monospace; text-transform: uppercase;
+        }
+
+        /* 結局畫面 */
+        #ending {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: none; z-index: 2000;
+            align-items: center; justify-content: center; text-align: center;
+        }
     </style>
 </head>
 <body>
 
-    <div class="debt-panel">
-        <div class="debt-label">ESTIMATED DAMAGES</div>
-        <div class="debt-value">$<span id="debt">0</span></div>
+<div id="overlay" onclick="startApp()">
+    <div>[ 偵測到受損檔案 0112 ]<br><br><span style="color:var(--accent); font-size:0.8rem;">點擊螢幕以解鎖記憶</span></div>
+</div>
+
+<div class="file-container">
+    <!-- 檔案一：案件報告 -->
+    <div id="page1" class="file-page">
+        <h2>████ 縱火案 - 勘驗摘要</h2>
+        <p><strong>案發時間：</strong> ██月██日 21:12</p>
+        <p><strong>現場描述：</strong> 入口遭外部反鎖。火勢極快，疑使用高濃度助燃劑。</p>
+        <p><strong>證物補述：</strong> 幼兒身穿定製小西裝，金屬扣殘存字母 <span class="black-out" onclick="openInput('VEIL')">[V _ _ L]</span>。</p>
+        <p><strong>異常紀錄：</strong> 案發時，有人看見門後站著一個戴著 <span class="black-out" onclick="openInput('MASK')">[M _ _ K]</span> 的人影正在凝視火海。</p>
+        <p style="text-align:center; color:#999; font-size:0.7rem; margin-top:40px;">（ 左滑查看孤兒院日誌 >> ）</p>
     </div>
 
-    <div class="office">
-        <div class="case-header">FILE ID: #2026-LUCA-OFFICE</div>
-        <div id="dialogue">（盧卡合上手中的卷宗，冷冷地看著你）<br><br>「當事人，雖然我按秒計費，但你的愚蠢程度顯然連這幾秒都不值得。說吧，你又惹了什麼麻煩？」</div>
-        <div class="options-container" id="options-box">
-            <button class="option-btn" onclick="nextStep('fight')"><span class="option-prefix">A.</span> 「我不小心揍了我的上司...」</button>
-            <button class="option-btn" onclick="nextStep('scam')"><span class="option-prefix">B.</span> 「我好像被網路詐騙了，錢全沒了。」</button>
-            <button class="option-btn" onclick="nextStep('bored')"><span class="option-prefix">C.</span> 「沒事，我只是想找你聊天。」</button>
-        </div>
+    <!-- 檔案二：觀察日誌 -->
+    <div id="page2" class="file-page hidden">
+        <h2>聖瑪利亞孤兒院 - 觀察日誌</h2>
+        <p><strong>生活事件：</strong> 今日發生集體霸凌。霸凌者將其家徽金屬扣丟入泥地踩踏。</p>
+        <p><strong>個案反應：</strong> 0112 毫無反抗。神情像是一個被掏空的 <span class="black-out" onclick="openInput('DOLL')">[D _ _ L]</span>。</p>
+        <p><strong>診斷：</strong> 個案似乎認為黑暗比光更安全。</p>
+        <p style="text-align:center; color:#999; font-size:0.7rem; margin-top:40px;">（ << 右滑查看現場報告 ）</p>
     </div>
+</div>
 
-    <script>
-        let currentDebt = 0;
-        const diagElement = document.getElementById('dialogue');
-        const optContainer = document.getElementById('options-box');
+<div id="input-box">
+    <input type="text" id="pass-input" maxlength="4" placeholder="....">
+</div>
 
-        const scenario = {
-            fight: {
-                text: "「揍了上司？呵，雖然我很欣賞你的勇氣，但法律只看證據。你那是蓄意傷害，還是你只是想測試對方的臉皮厚度？」",
-                options: [
-                    { prefix: "A", t: "「是他先羞辱我的人格！」", next: "fight_lose" },
-                    { prefix: "B", t: "「我當時手滑，沒控制住力道。」", next: "fight_prison" }
-                ],
-                fine: 50000
-            },
-            scam: {
-                text: "「被詐騙？這種二十世紀的受騙方式竟然還能在你身上發生。看來你的大腦還停留在撥接時代。錢轉出去了嗎？」",
-                options: [
-                    { prefix: "A", t: "「全轉了，連下個月房租都在裡面。」", next: "scam_broke" },
-                    { prefix: "B", t: "「還好，我及時發現只損失了三萬。」", next: "scam_lucky" }
-                ],
-                fine: 30000
-            },
-            bored: {
-                text: "「聊天？當事人，你是覺得我的諮詢費太便宜，還是你的時間多到可以隨便揮霍？出去，或是現在付我五萬美金。」",
-                options: [
-                    { prefix: "A", t: "「對不起，我這就滾出辦公室。」", next: "end_run" },
-                    { prefix: "B", t: "「（遞出支票）這是一百萬，請陪我聊。」", next: "end_rich" }
-                ],
-                fine: 50000
-            },
-            fight_lose: { text: "「羞辱？那叫職場指導。當事人，你準備好賠償對方的醫療費加上精神損失了嗎？我建議你直接把房子過戶給他省事。」", options: [], fine: 2000000 },
-            fight_prison: { text: "「手滑？這個理由留著去跟監獄裡的獄友說吧，他們會很喜歡你這種幽默感的。尤其是當你幫他們撿肥皂的時候。」", options: [], fine: 0 },
-            scam_broke: { text: "「很好，現在你唯一的價值就是作為『愚蠢案例』被寫進法律教科書。出去，別把窮酸氣帶進我的辦公室。」", options: [], fine: 999999 },
-            scam_lucky: { text: "「三萬塊買個教訓，看來你的智商也就值這個價。下次再被騙，記得別來找我，直接去警察局門口哭比較快。」", options: [], fine: 10000 },
-            end_run: { text: "（你灰溜溜地逃出了辦公室，背後傳來盧卡一聲冷哼。）", options: [], fine: 0 },
-            end_rich: { text: "「（收下支票）...突然覺得你的邏輯也不是那麼不可救藥。坐下，我們從這場對話的『無罪化』開始聊起。」", options: [], fine: -1000000 }
-        };
+<div id="ending">
+    <h1 id="ending-text" style="font-size:1.2rem; letter-spacing:4px; color:var(--accent);"></h1>
+</div>
 
-        function nextStep(id) {
-            const node = scenario[id];
-            if(!node) return;
+<script>
+    // 音效資源 (使用開源素材)
+    const sounds = {
+        fire: new Audio('https://assets.mixkit.co/active_storage/sfx/2437/2437-preview.mp3'), // 類火燒聲
+        orphan: new Audio('https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3'), // 類環境聲
+        paper: new Audio('https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3'),
+        type: new Audio('https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3'),
+        heart: new Audio('https://assets.mixkit.co/active_storage/sfx/2180/2180-preview.mp3')
+    };
 
-            // 更新賠償金
-            currentDebt += node.fine || 0;
-            document.getElementById('debt').innerText = currentDebt.toLocaleString();
+    let currentTarget = "";
+    let startTime = 0;
+    let isStarted = false;
 
-            // 更新對話與選項
-            diagElement.innerHTML = node.text;
-            optContainer.innerHTML = "";
+    function startApp() {
+        isStarted = true;
+        startTime = Date.now();
+        document.getElementById('overlay').style.display = 'none';
+        sounds.fire.loop = true;
+        sounds.orphan.loop = true;
+        playBGM('fire');
+    }
 
-            if(node.options && node.options.length > 0) {
-                node.options.forEach(o => {
-                    const btn = document.createElement('button');
-                    btn.className = "option-btn";
-                    btn.innerHTML = `<span class="option-prefix">${o.prefix}.</span> ${o.t}`;
-                    btn.onclick = () => nextStep(o.next);
-                    optContainer.appendChild(btn);
-                });
+    function playBGM(type) {
+        if (type === 'fire') {
+            sounds.fire.play(); sounds.fire.volume = 0.3;
+            sounds.orphan.pause();
+        } else {
+            sounds.orphan.play(); sounds.orphan.volume = 0.3;
+            sounds.fire.pause();
+        }
+    }
+
+    function openInput(target) {
+        if(!isStarted) return;
+        currentTarget = target;
+        sounds.type.play();
+        if(navigator.vibrate) navigator.vibrate(15);
+        document.getElementById('input-box').style.display = 'block';
+        document.getElementById('pass-input').focus();
+    }
+
+    // 滑動邏輯
+    let startX = 0;
+    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    document.addEventListener('touchend', e => {
+        let diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+            const p1 = document.getElementById('page1');
+            const p2 = document.getElementById('page2');
+            const isP1 = !p1.classList.contains('hidden');
+            
+            p1.classList.toggle('hidden', isP1);
+            p2.classList.toggle('hidden', !isP1);
+            sounds.paper.play();
+            playBGM(isP1 ? 'orphan' : 'fire');
+        }
+    });
+
+    // 輸入邏輯
+    document.getElementById('pass-input').addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            const val = this.value.toUpperCase();
+            const time = (Date.now() - startTime) / 1000;
+
+            if (val === "VEIL") {
+                showEnding(time < 20 ? "TRUE" : "NORMAL");
+            } else if (val === "MASK" && time < 11.2) {
+                showEnding("SECRET");
+            } else if (val === "DOLL") {
+                showEnding("NORMAL");
             } else {
-                const restartBtn = document.createElement('button');
-                restartBtn.className = "option-btn";
-                restartBtn.innerHTML = `<span class="option-prefix">></span> 案件結束，接受審判 (重新開始)`;
-                restartBtn.onclick = () => location.reload();
-                optContainer.appendChild(restartBtn);
+                if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
+                this.value = "";
             }
         }
-    </script>
+    });
+
+    function showEnding(type) {
+        const endView = document.getElementById('ending');
+        const endText = document.getElementById('ending-text');
+        endView.style.display = 'flex';
+        
+        if (type === "TRUE") endText.innerText = "THE BLOOD IS STILL WARM.";
+        else if (type === "SECRET") {
+            endText.innerText = "I SAW YOU SMILING.";
+            sounds.heart.play();
+        } else endText.innerText = "NOTHING BUT ASHES.";
+        
+        sounds.fire.pause();
+        sounds.orphan.pause();
+    }
+</script>
 </body>
 </html>

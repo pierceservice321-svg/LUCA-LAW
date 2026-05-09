@@ -15,7 +15,7 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 呼吸殘影 */
+        /* 呼吸效果 */
         #breathe-txt {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 6rem; font-weight: 900; color: rgba(255,255,255,0.02);
@@ -32,38 +32,35 @@
         .report-sheet {
             width: 85%; max-width: 440px; height: 80vh;
             background: var(--paper); padding: 40px; box-sizing: border-box;
-            box-shadow: 0 0 50px rgba(0,0,0,1), inset 0 0 100px rgba(0,0,0,0.1);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
             position: relative; border: 1px solid #999; transform: rotate(-0.5deg);
-            overflow-y: auto; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            color: var(--ink);
+            overflow-y: auto; display: none; color: var(--ink);
         }
 
-        h1 { font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 30px; text-align: center; letter-spacing: 8px; font-weight: 700; }
-        .section { margin-bottom: 25px; font-size: 1rem; line-height: 2; border-left: 3px solid #bbb; padding-left: 15px; }
-        .label { font-weight: 700; font-size: 0.75rem; color: #666; display: block; margin-bottom: 5px; letter-spacing: 2px; }
+        h1 { font-size: 1.3rem; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 30px; text-align: center; letter-spacing: 8px; }
+        .section { margin-bottom: 25px; font-size: 1rem; line-height: 2; border-left: 3px solid #bbb; padding-left: 15px; min-height: 20px; }
+        .label { font-weight: 700; font-size: 0.75rem; color: #666; display: block; margin-bottom: 5px; }
 
         /* 密碼空格 */
         .black-out {
             background: #111; color: #111; padding: 0 10px; cursor: pointer; transition: 0.4s;
-            border-bottom: 2px solid var(--accent); letter-spacing: 5px; font-weight: bold;
+            border-bottom: 2px solid var(--accent); letter-spacing: 5px; display: inline-block;
         }
-        .active-target { animation: pulse-red 1.5s infinite; color: #222 !important; }
-        @keyframes pulse-red { 0%, 100% { background: #000; box-shadow: 0 0 0px #f00; } 50% { background: #300; box-shadow: 0 0 10px #f00; } }
+        .active-target { animation: pulse-red 1.5s infinite; }
+        @keyframes pulse-red { 0%, 100% { background: #000; } 50% { background: #300; box-shadow: 0 0 10px #f00; } }
 
-        /* 前傳與開始畫面 */
+        /* 開始畫面 */
         #gate-screen {
             position: fixed; z-index: 9999; width: 100%; height: 100%; background: #000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; text-align: center;
         }
-        .prelude-content {
-            max-width: 80%; margin-bottom: 60px; line-height: 2.5; letter-spacing: 4px;
-            color: #666; font-size: 0.9rem; transition: 1s;
+        #prelude-text {
+            max-width: 80%; min-height: 120px; margin-bottom: 60px; line-height: 2.5; 
+            letter-spacing: 4px; color: #777; font-size: 0.95rem; text-align: center;
         }
         .gate-btn {
             border: 1px solid #444; padding: 20px 40px; color: #888;
-            letter-spacing: 10px; font-size: 0.9rem; transition: 0.5s;
-            background: transparent;
+            letter-spacing: 10px; font-size: 0.9rem; cursor: pointer; transition: 0.5s;
         }
         .gate-btn:hover { color: #fff; border-color: #fff; box-shadow: 0 0 30px rgba(255,0,0,0.2); }
 
@@ -92,68 +89,119 @@
 <div id="breathe-txt">Breathe</div>
 <div id="death-mask"></div>
 
-<div id="gate-screen" onclick="startApp()">
-    <div class="prelude-content" id="prelude">
-        那一晚的火，燒掉了遮蔽真相的「面紗」。<br>
-        冰冷的雨，將碎裂的人偶填滿泥濘。<br>
-        <span style="font-size: 0.7rem; color: #333; display: block; margin-top: 30px;">[ 系統檢測到音頻輸入：雨聲、餘火聲 ]</span>
-    </div>
-    <div class="gate-btn">接入檔案 0112</div>
+<div id="gate-screen">
+    <div id="prelude-text"></div>
+    <div class="gate-btn" id="start-btn" style="display:none;" onclick="enterArchive()">接入檔案 0112</div>
 </div>
 
-<div class="report-sheet" id="doc" style="display: none;">
-    <h1>臨床行為觀察紀錄</h1>
-    
-    <div class="section">
-        <span class="label">患者姓名</span>
-        盧卡．維爾 (Luca <span class="black-out active-target" onclick="trigger('VEIL')">_ _ _ _</span>)
-    </div>
-
-    <div class="section">
-        <span class="label">背景：莊園記憶</span>
-        他在火災廢墟中被發現時，四周仍有餘火在燃燒。醫護人員描述，個案雙眼失神，左手緊握著象徵家族的遺物。即便當時正降下暴雨，他仍對周遭的呼喊毫無反應。
-    </div>
-
-    <div class="section">
-        <span class="label">臨床創傷紀錄</span>
-        根據目擊，個案在隨後的霸凌事件中被推入泥潭。施暴者將汙泥強行灌入其口中，戲稱其為「燒焦的 <span class="black-out" id="t2" onclick="trigger('DOLL')">_ _ _ _</span>」。此時個案表現出極度的心理隔離。
-    </div>
-
-    <div class="section" style="border-top: 1px solid #ccc; padding-top:20px; font-size:0.85rem; color:#666; border-left: none;">
-        「他不再試圖逃跑，也不再發聲。他只是在火與雨的縫隙中，機械式地維持著呼吸。」
-    </div>
+<div class="report-sheet" id="doc">
+    <h1 id="title-main"></h1>
+    <div id="content-area"></div>
 </div>
 
 <div id="input-panel">
     <input type="text" id="pass-field" maxlength="4" placeholder="..." autocomplete="off">
 </div>
 
+<!-- 音效 -->
 <audio id="rain" src="https://assets.mixkit.co/active_storage/sfx/2526/2526-preview.mp3" loop></audio>
 <audio id="fire" src="https://assets.mixkit.co/active_storage/sfx/2471/2471-preview.mp3" loop></audio>
-<audio id="glitch" src="https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3"></audio>
-<audio id="page" src="https://assets.mixkit.co/active_storage/sfx/1547/1547-preview.mp3"></audio>
+<audio id="type-sfx" src="https://www.soundjay.com/communication/typewriter-key-1.mp3"></audio>
 
 <script>
-    let errors = 0; let solvedCount = 0; let currentTarget = "";
+    const preludeLines = [
+        "那一晚的火，燒掉了真相的「面紗」。",
+        "冰冷的雨，將碎裂的人偶填滿泥濘。"
+    ];
 
-    function startApp() {
-        // 播放音效
-        document.getElementById('rain').play().catch(e => console.log("Audio Error"));
-        document.getElementById('fire').play().catch(e => console.log("Audio Error"));
-        
-        // 切換畫面
+    const reportContent = [
+        { label: "患者姓名", text: "盧卡．維爾 (Luca [TARGET1])" },
+        { label: "背景：莊園記憶", text: "他在火災廢墟中被發現時，四周仍有餘火。醫護人員描述，個案左手緊握遺物，即便暴雨傾盆，他仍毫無反應。" },
+        { label: "臨床創傷紀錄", text: "個案被推入泥潭，施暴者將汙泥灌入其口中，戲稱其為「燒焦的 [TARGET2]」。此時個案表現出極度的解離。" }
+    ];
+
+    let errors = 0;
+    let solvedCount = 0;
+    let currentTarget = "";
+
+    // 打字機功能
+    async function typeWriter(text, element, speed = 100) {
+        for (let i = 0; i < text.length; i++) {
+            element.innerHTML += text.charAt(i);
+            if (text.charAt(i) !== " ") {
+                const sfx = document.getElementById('type-sfx').cloneNode();
+                sfx.volume = 0.2; sfx.play();
+            }
+            await new Promise(res => setTimeout(res, speed));
+        }
+    }
+
+    // 初始化：顯示前傳
+    window.onload = async () => {
+        const preludeEl = document.getElementById('prelude-text');
+        for (let line of preludeLines) {
+            await typeWriter(line, preludeEl, 120);
+            preludeEl.innerHTML += "<br>";
+        }
+        document.getElementById('start-btn').style.display = "block";
+    };
+
+    // 進入檔案
+    async function enterArchive() {
+        document.getElementById('rain').play();
+        document.getElementById('fire').play();
         document.getElementById('gate-screen').style.opacity = '0';
-        setTimeout(() => {
+        
+        setTimeout(async () => {
             document.getElementById('gate-screen').style.display = 'none';
             document.getElementById('doc').style.display = 'block';
+            
+            // 逐字標題
+            await typeWriter("臨床行為觀察紀錄", document.getElementById('title-main'), 150);
+            
+            // 逐段生成內容
+            const area = document.getElementById('content-area');
+            for (let i = 0; i < reportContent.length; i++) {
+                const section = document.createElement('div');
+                section.className = 'section';
+                area.appendChild(section);
+                
+                const label = document.createElement('span');
+                label.className = 'label';
+                section.appendChild(label);
+                await typeWriter(reportContent[i].label, label, 50);
+
+                let rawText = reportContent[i].text;
+                if (rawText.includes("[TARGET1]")) {
+                    const parts = rawText.split("[TARGET1]");
+                    section.innerHTML += parts[0];
+                    const span = document.createElement('span');
+                    span.className = 'black-out active-target';
+                    span.innerText = '_ _ _ _';
+                    span.onclick = () => trigger('VEIL');
+                    section.appendChild(span);
+                    section.innerHTML += parts[1];
+                } else if (rawText.includes("[TARGET2]")) {
+                    const parts = rawText.split("[TARGET2]");
+                    section.innerHTML += parts[0];
+                    const span = document.createElement('span');
+                    span.id = "t2";
+                    span.className = 'black-out';
+                    span.innerText = '_ _ _ _';
+                    span.onclick = () => trigger('DOLL');
+                    section.appendChild(span);
+                    section.innerHTML += parts[1];
+                } else {
+                    await typeWriter(rawText, section, 30);
+                }
+                await new Promise(res => setTimeout(res, 500));
+            }
         }, 1000);
 
-        // 啟動呼吸動畫
         setInterval(() => {
             const b = document.getElementById('breathe-txt');
             b.classList.remove('breathe-anim');
-            void b.offsetWidth;
-            b.classList.add('breathe-anim');
+            void b.offsetWidth; b.classList.add('breathe-anim');
         }, 5000);
     }
 
@@ -166,44 +214,28 @@
 
     document.getElementById('pass-field').addEventListener('keyup', e => {
         if(e.key === 'Enter') {
-            const inputVal = e.target.value.toUpperCase();
-            if(inputVal === currentTarget) {
-                document.getElementById('page').play();
+            const val = e.target.value.toUpperCase();
+            if(val === currentTarget) {
                 document.getElementById('input-panel').style.display = 'none';
-                
                 const el = document.querySelector(`.black-out[onclick*="${currentTarget}"]`);
                 el.innerText = currentTarget;
                 el.style.background = "transparent";
                 el.style.color = "var(--accent)";
                 el.classList.remove('active-target');
-
-                // 成功動態
-                const doc = document.getElementById('doc');
-                doc.style.transform = "rotate(0deg) scale(1.05)";
-                setTimeout(() => doc.style.transform = "rotate(-0.5deg) scale(1)", 300);
-
                 solvedCount++;
                 if(solvedCount === 1) document.getElementById('t2').classList.add('active-target');
                 e.target.value = "";
             } else {
-                document.getElementById('glitch').play();
-                errors++;
-                e.target.value = "";
+                errors++; e.target.value = "";
                 if(errors >= 3) gameOver();
             }
         }
     });
 
     function gameOver() {
-        document.getElementById('input-panel').style.display = 'none';
         document.getElementById('death-mask').classList.add('is-dead');
         setTimeout(() => {
-            document.body.innerHTML = `
-                <div style="background:#000; color:#700; height:100vh; width:100vw; display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                    <h2 style="letter-spacing:15px; font-weight:bold;">檔案已毀損</h2>
-                    <p style="color:#444; letter-spacing:5px;">個案意識崩潰：未檢測到生命特徵</p>
-                </div>
-            `;
+            document.body.innerHTML = "<div style='color:#700; text-align:center; padding-top:45vh; font-weight:bold; letter-spacing:10px;'>檔案已毀損</div>";
         }, 2000);
     }
 </script>

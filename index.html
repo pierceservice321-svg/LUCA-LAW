@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_DEATH_JOURNAL</title>
+    <title>FILE_0112_TERMINATION_PROTOCOL</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* 認證門戶 */
+        /* 門戶介面 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
-        /* 詩歌過渡 */
+        /* 詩歌層 */
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         #poem-area { margin-top: 5vh; line-height: 3; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
         .poem-line { min-height: 1.5em; margin-bottom: 15px; opacity: 0; transition: opacity 0.8s; font-size: 1.3rem; }
 
-        /* 報告文本 */
+        /* 報告文件 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
             padding: 70px 60px; box-sizing: border-box; display: none; color: var(--ink); 
@@ -29,12 +29,12 @@
         .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
-        /* 輸入面板 */
+        /* 輸入介面 */
         #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 70px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid var(--accent); }
         #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3.5rem; outline: none; letter-spacing: 25px; font-family: 'Courier Prime'; }
 
-        /* 結局層 */
-        #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; overflow-y: auto; }
+        /* 結局圖層 */
+        #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; }
         .death-paper { width: 85%; max-width: 680px; background: #fff; color: #111; padding: 50px; font-family: 'Courier Prime', monospace; border: 1px solid #000; position: relative; line-height: 1.6; }
         .death-stamp { position: absolute; top: 40px; right: 40px; border: 6px solid #800; color: #800; padding: 10px 30px; font-size: 2rem; transform: rotate(15deg); font-weight: bold; }
         
@@ -71,12 +71,12 @@
     <div id="doc-content">
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>個案於暴雨午後被三名院生強行帶往北側集水區。個案並未呼救，其意識已進入深層解離狀態。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄、沒有靈魂的<strong>破布偶</strong>。</p>
+            <p>施暴者將個案推入泥坑中，其中一名領頭者踩住了個案的左手背反覆碾壓。個案並未呼救。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄的<strong>破布偶</strong>。</p>
         </div>
 
         <div class="section-box">
             <h2>二、 關鍵物證：血染的家徽</h2>
-            <p>個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。儘管扣子嵌入肉內，指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
+            <p>個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
         </div>
 
         <div class="section-box">
@@ -107,13 +107,19 @@
         if(!val) return;
         playerName = val;
         
-        document.getElementById('sfx-rain').volume = 0.5;
-        document.getElementById('sfx-rain').play();
+        // 1. 播放雨聲
+        const rain = document.getElementById('sfx-rain');
+        rain.volume = 0.5;
+        rain.play();
 
-        // 槍聲預熱
+        // 2. 暴力解鎖槍聲音訊 (核心修正：強制瀏覽器紀錄播放行為)
         const gunshot = document.getElementById('sfx-gunshot');
-        gunshot.volume = 0;
-        gunshot.play().then(() => { gunshot.pause(); gunshot.currentTime = 0; gunshot.volume = 1; });
+        gunshot.volume = 0.01;
+        gunshot.play().then(() => {
+            gunshot.pause();
+            gunshot.currentTime = 0;
+            gunshot.volume = 1.0; 
+        }).catch(e => console.log("Sound unlock required action"));
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
@@ -160,8 +166,16 @@
                 if(Object.values(solved).every(v => v)) setTimeout(triggerDiary, 800);
             } else {
                 errors++;
-                document.getElementById('sfx-footstep').play();
-                if(errors >= 2) triggerDeath();
+                // 播放腳步聲警告
+                const foot = document.getElementById('sfx-footstep');
+                foot.currentTime = 0;
+                foot.play();
+
+                if(errors >= 3) { // 修正為錯誤三次觸發
+                    triggerDeath();
+                } else {
+                    console.log("錯誤次數: " + errors);
+                }
             }
             document.getElementById('input-panel').style.display='none'; 
             e.target.value="";
@@ -170,24 +184,36 @@
 
     function triggerDeath() {
         const gunshot = document.getElementById('sfx-gunshot');
-        gunshot.currentTime = 0; gunshot.play();
+        
+        // 核心修正：強制重新加載資源並播放
+        gunshot.load(); 
+        gunshot.volume = 1.0;
+        
+        const playPromise = gunshot.play();
 
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                console.log("槍聲成功播放");
+            }).catch(error => {
+                console.log("槍聲被瀏覽器攔截:", error);
+            });
+        }
+
+        // 視覺效果延遲出現，確保聽覺先行
         setTimeout(() => {
             document.getElementById('scare-layer').style.display = 'flex';
             document.getElementById('death-content').innerHTML = `
+                <p><strong>REPORT_ID:</strong> ERR_EXP_FAIL</p>
                 <p><strong>SUBJECT:</strong> ${playerName}</p>
                 <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷 (Gunshot Wound)</p>
                 <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-                <p><strong>OBSERVATION LOG:</strong><br>執行者：Victor。子彈自額前正中央入彈。受試者在0.02秒內喪失意識。清理程序完成。</p>
+                <p><strong>OBSERVATION:</strong><br>執行者：Victor。在第三次密碼驗證失敗後，執行清理程序。子彈貫穿枕骨，受試者立即喪失意識。</p>
             `;
-        }, 150);
+        }, 100);
     }
 
     async function triggerDiary() {
         document.getElementById('sfx-page').play();
-        document.getElementById('report-title').style.color = "#a00";
-        document.getElementById('report-title').innerText = "PRIVATE ACCESS GRANTED";
-        
         const box = document.getElementById('doc-content');
         box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
         

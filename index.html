@@ -3,38 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_DEATH_DIVERSITY</title>
+    <title>FILE_0112_VICTOR_SHADOW</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* 介面排版 */
-        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        #poem-area { margin-top: 18vh; line-height: 5; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
-
+        /* 門扉介面 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
+        .enter-btn:hover { border-color: var(--accent); color: #fff; box-shadow: 0 0 15px var(--accent); }
 
+        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        #poem-area { margin-top: 15vh; line-height: 4.5; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
+
+        /* 報告介面 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
             padding: 70px 60px; box-sizing: border-box; display: none; color: var(--ink); 
             position: relative; z-index: 5; margin: 5vh auto; overflow-y: auto;
             border: 1px solid #777; box-shadow: inset 0 0 100px rgba(0,0,0,0.1), 0 0 80px rgba(0,0,0,0.9);
         }
-
-        .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; transition: 0.3s; }
+        .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
         #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 70px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid var(--accent); }
         #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3.5rem; outline: none; letter-spacing: 25px; font-family: 'Courier Prime'; }
 
-        /* 死亡層疊 */
+        /* 死亡層 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; overflow-y: auto; }
-        .death-paper { width: 85%; max-width: 680px; background: #fff; color: #111; padding: 50px; font-family: 'Courier Prime', monospace; border: 1px solid #000; position: relative; margin: 20px; }
-        .medical-bold { font-weight: bold; text-decoration: underline; background: #eee; }
-        .death-stamp { position: absolute; top: 40px; right: 40px; border: 6px solid #800; color: #800; padding: 10px 30px; font-size: 2rem; transform: rotate(15deg); opacity: 0.8; font-weight: bold; }
+        .death-paper { width: 85%; max-width: 680px; background: #fff; color: #111; padding: 50px; font-family: 'Courier Prime', monospace; border: 1px solid #000; position: relative; }
+        .death-stamp { position: absolute; top: 40px; right: 40px; border: 6px solid #800; color: #800; padding: 10px 30px; font-size: 2rem; transform: rotate(15deg); font-weight: bold; }
 
         h1 { font-size: 1.8rem; text-align: center; border-bottom: 4px double #000; padding-bottom: 15px; }
         h2 { font-size: 1.1rem; margin-top: 40px; border-left: 8px solid var(--accent); padding-left: 15px; text-transform: uppercase; }
@@ -43,39 +43,35 @@
 </head>
 <body>
 
-<audio id="sfx-rain" loop src="https://www.soundjay.com/nature/sounds/rain-01.mp3"></audio> 
-<audio id="sfx-fire" loop src="https://www.soundjay.com/nature/sounds/fire-1.mp3"></audio>
-<audio id="sfx-gunshot" src="https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"></audio>
-<audio id="sfx-footstep" src="https://www.soundjay.com/footsteps/sounds/footsteps-4.mp3"></audio>
-<audio id="sfx-knife" src="https://www.soundjay.com/mechanical/sounds/knife-sharpen-1.mp3"></audio>
+<!-- 音訊資源 -->
+<audio id="sfx-rain" loop src="https://assets.mixkit.co/active_storage/sfx/2452/2452-preview.mp3"></audio> 
+<audio id="sfx-fire" loop src="https://assets.mixkit.co/active_storage/sfx/678/678-preview.mp3"></audio>
+<audio id="sfx-gunshot" src="https://assets.mixkit.co/active_storage/sfx/1678/1678-preview.mp3"></audio>
+<audio id="sfx-footstep" src="https://assets.mixkit.co/active_storage/sfx/26/26-preview.mp3"></audio>
+<audio id="sfx-knife" src="https://assets.mixkit.co/active_storage/sfx/1206/1206-preview.mp3"></audio>
 
 <div id="name-gate">
-    <div style="color: #666; letter-spacing: 10px; margin-bottom: 40px; font-size: 0.75rem;">SECURE_VOICE_INITIATED</div>
-    <input type="text" id="user-name" class="name-box" placeholder="INPUT_NAME" maxlength="12">
-    <button class="enter-btn" onclick="confirmName()">ACCESS ARCHIVE</button>
+    <div style="color: #666; letter-spacing: 10px; margin-bottom: 40px; font-size: 0.75rem;">AUTHENTICATION_REQUIRED</div>
+    <input type="text" id="user-name" class="name-box" placeholder="SUBJECT_NAME" maxlength="12">
+    <button class="enter-btn" onclick="initSystem()">ACCESS</button>
 </div>
 
 <div id="gate-screen">
     <div id="poem-area"></div>
-    <div style="color:#500; font-size:0.8rem; margin-top:80px; letter-spacing:20px; opacity:0.4;">[ TOUCH_TO_DECRYPT ]</div>
+    <div style="color:#500; font-size:0.8rem; margin-top:80px; letter-spacing:20px; opacity:0.6;">[ TAP TO PROCEED ]</div>
 </div>
 
 <div class="report-sheet" id="doc">
     <h1>EXPERIMENTAL PATHOLOGY REPORT</h1>
     <div id="doc-content">
         <p><strong>SUBJECT:</strong> LUCA / <strong>ID:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
-        
-        <h2>I. SYMPTOMATOLOGY</h2>
-        <p>樣本在家族毀滅後的自毀表現。其指尖殘留的 **Sublingual Hematoma** (甲下出血) 顯示其反覆挖掘地面。其認知系統已被 **VICTOR** 徹底重構。</p>
-
+        <h2>I. NEUROLOGICAL STATUS</h2>
+        <p>樣本指尖顯示明顯的 **Sublingual Hematoma** (甲下出血)，與挖掘堅硬地表的行為一致。靈魂完整度評估為：CRITICAL。</p>
         <h2>II. PSYCHOSOMATIC ANCHOR</h2>
-        <p>精神支柱標記：<span id="gap-V" class="input-gap" onclick="openInput('V')">█</span>。</p>
-
+        <p>精神支柱：標記為 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 的金屬片。</p>
         <h2>III. CHIEF SUPERVISOR</h2>
-        <p>最高權限持有者：<span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span>。</p>
-        <p style="color: #666; font-style: italic; border-top: 1px solid #ccc; padding-top: 10px;">
-            ※ 提示：他是樣本眼中的 **Father**，是名為 **Victor** 的造物主。
-        </p>
+        <p>最高管理權限持有者：<span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span>。</p>
+        <p style="color:#666; font-style:italic; border-top: 1px solid #ccc; padding-top: 5px;">(※ 提示：他是名為 Victor 的主宰者。)</p>
     </div>
 </div>
 
@@ -85,8 +81,7 @@
 
 <div id="scare-layer">
     <div class="death-paper">
-        <div class="death-stamp">EXPIRED</div>
-        <div class="death-header" style="border-bottom: 2px solid #000; margin-bottom: 20px; padding-bottom: 10px; font-weight: bold;">[ TERMINATION_LOG_EXTENDED ]</div>
+        <div class="death-stamp">TERMINATED</div>
         <div id="death-content"></div>
     </div>
 </div>
@@ -96,42 +91,63 @@
     let solved = {"1102":false, "V":false, "VICTOR":false};
     let errors = 0;
 
-    function confirmName() {
+    function initSystem() {
         const val = document.getElementById('user-name').value.trim();
-        if(val) { playerName = val; document.getElementById('name-gate').style.display='none'; document.getElementById('gate-screen').style.display='flex'; document.getElementById('sfx-rain').play(); startPoem(); }
+        if(!val) return;
+        playerName = val;
+
+        // 喚醒所有音軌 (核心修復)
+        const audios = document.querySelectorAll('audio');
+        audios.forEach(a => { a.play().then(() => a.pause()).catch(() => {}); });
+
+        document.getElementById('name-gate').style.display='none';
+        document.getElementById('gate-screen').style.display='flex';
+        
+        const rain = document.getElementById('sfx-rain');
+        rain.volume = 0.5; rain.play();
+        startPoem();
     }
 
     async function startPoem() {
         const area = document.getElementById('poem-area');
-        const lines = ["Fire consumes the secret", "The letter in steel", "Is your only truth"];
+        // 加入了 VICTOR 的詩歌
+        const lines = [
+            "VICTOR lighting the pyre", 
+            "The flame consumes the secret", 
+            "The letter in steel", 
+            "Is your only truth"
+        ];
         for(let line of lines) {
             let d = document.createElement('div'); area.appendChild(d);
             for(let char of line) { d.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
-            await new Promise(r=>setTimeout(r, 1000));
+            await new Promise(r=>setTimeout(r, 1200));
         }
-        document.getElementById('gate-screen').onclick = () => { document.getElementById('gate-screen').style.display='none'; document.getElementById('doc').style.display='block'; };
+        document.getElementById('gate-screen').onclick = () => {
+            document.getElementById('gate-screen').style.display='none';
+            document.getElementById('doc').style.display='block';
+        };
     }
 
     function openInput(id) { 
-        const panel = document.getElementById('input-panel');
+        document.getElementById('sfx-rain').play();
+        document.getElementById('input-panel').style.display='block'; 
         const field = document.getElementById('pass-field');
-        panel.style.display='block'; 
         field.placeholder = "-".repeat(id === 'VICTOR' ? 6 : id.length); 
-        field.focus(); 
-        window.targetKey = id; 
+        field.focus(); window.targetKey = id; 
     }
 
     document.getElementById('pass-field').onkeypress = (e) => {
         if(e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
-            let isCorrect = (val === window.targetKey || (window.targetKey === 'VICTOR' && val === 'FATHER'));
+            const isCorrect = (val === window.targetKey || (window.targetKey === 'VICTOR' && val === 'FATHER'));
             if(isCorrect) {
                 solved[window.targetKey] = true;
                 const gap = document.getElementById('gap-' + window.targetKey);
                 gap.innerHTML = (window.targetKey === 'VICTOR' ? val : window.targetKey); gap.className = "solved";
                 if(Object.values(solved).every(v => v)) triggerDiary();
             } else {
-                errors++; document.getElementById('sfx-footstep').play();
+                errors++;
+                document.getElementById('sfx-footstep').play();
                 if(errors >= 2) triggerDeath();
             }
             document.getElementById('input-panel').style.display='none'; e.target.value="";
@@ -140,32 +156,28 @@
 
     function triggerDeath() {
         const scenarios = [
-            { t: "爭執/持刀處決", w: "Scalpel #11 (醫用手術刀)", s: "sfx-knife", c: "頸動脈切割伴隨噴濺性失血", d: "受試者 ${playerName} 在爭執中試圖奪取器械，遭執行者順勢割斷喉部。" },
-            { t: "槍械清除", w: ".45 ACP M1911", s: "sfx-gunshot", c: "額葉穿透性彈道傷", d: "於 3 米距離進行清除，樣本無反抗機會。" },
-            { t: "鈍力致死", w: "警棍 / 鐵槌", s: "sfx-footstep", c: "顱骨粉碎性骨折", d: "爭執過程中遭重擊後腦，腦漿組織外溢。" },
-            { t: "生化注入", w: "Potassium Chloride (高濃度鉀鹽)", s: "sfx-rain", c: "急性心肌停跳", d: "樣本遭強行固定於實驗床，由 VICTOR 親自執行靜脈推注。" },
-            { t: "窒息清除", w: "Wire Cords (鋼琴線)", s: "sfx-footstep", c: "頸椎斷裂及軟組織絞傷", d: "自後方接近，樣本在 45 秒後失去生理反應。" },
-            { t: "電擊過載", w: "Industrial Taser (工業電擊器)", s: "sfx-rain", c: "中樞神經系統燒灼", d: "強大電流導致心室顫動及不可逆性腦損傷。" },
-            { t: "陷阱/穿刺", w: "Floor Spikes", s: "sfx-knife", c: "腹腔多器官貫穿傷", d: "樣本在逃跑過程中觸發陷阱，因失血性休克死亡。" },
-            { t: "VICTOR 親自處置", w: "Bare Hands (雙手扼殺)", s: "sfx-footstep", c: "喉結碎裂伴隨窒息", d: "VICTOR 嘲弄地看著 ${playerName} 的眼睛，直到瞳孔完全放大。" },
-            { t: "化學腐蝕", w: "Sulfuric Acid Vat (強酸槽)", s: "sfx-rain", c: "全身組織碳化", d: "受試者在清醒狀態下被推入處理槽，耗時 3 分鐘完全溶解。" },
-            { t: "冷兵器刺穿", w: "Rapier (細劍)", s: "sfx-knife", c: "心臟瓣膜損毀", d: "精準刺入第四肋間隙，樣本在痛苦中抽搐停止。" },
-            { t: "失控焚毀", w: "Incendiary Grenade", s: "sfx-fire", c: "四度燒傷及呼吸道灼傷", d: "實驗室失控，樣本在封閉空間內遭高溫熱浪焚毀。" },
-            { t: "實驗性截斷", w: "Bone Saw (骨鋸)", s: "sfx-knife", c: "神經性休克與大出血", d: "為收集樣本，執行者在未麻醉狀態下進行生理截斷處置。" }
+            { t: "爭執/持刀處決", s: "sfx-knife", c: "Exsanguination (大量失血)", d: "樣本與執行者爭執，遭割斷喉動脈。" },
+            { t: "槍械清除", s: "sfx-gunshot", c: "額葉穿孔 (Ballistic Trauma)", d: "於 1 米內處決，執行者：VICTOR。" },
+            { t: "窒息/絞殺", s: "sfx-footstep", c: "Asphyxiation (呼吸道阻塞)", d: "執行者從後方接近，雙手扼殺至瞳孔放大。" },
+            { t: "高溫焚毀", s: "sfx-fire", c: "組織碳化 (4th Degree Burn)", d: "實驗室失火，樣本遭封鎖於高溫環境死亡。" },
+            { t: "生化注入", s: "sfx-rain", c: "心室顫動 (Cardiac Arrest)", d: "注入高濃度氯化鉀，由 VICTOR 監督執行。" },
+            { t: "高空墜落", s: "sfx-footstep", c: "多處臟器爆裂 (Internal Rupture)", d: "於爭執中遭推落監控塔樓。" },
+            { t: "化學腐蝕", s: "sfx-rain", c: "組織消解 (Acidic Dissolution)", d: "樣本遭推入強酸池，遺體無法辨識。" },
+            { t: "鈍力重擊", s: "sfx-footstep", c: "硬腦膜下血腫", d: "遭金屬重物擊中太陽穴導致腦部結構崩潰。" },
+            { t: "低溫凍結", s: "sfx-rain", c: "失溫性呼吸停擺", d: "遭囚禁於低溫儲藏室作為標本。" },
+            { t: "鋼線勒頸", s: "sfx-knife", c: "頸部橫向切割", d: "執行者使用細鋼絲進行高效清除。" }
         ];
-
         const scene = scenarios[Math.floor(Math.random()*scenarios.length)];
-        document.getElementById(scene.s).play();
+        const aud = document.getElementById(scene.s);
+        aud.currentTime = 0; aud.play();
 
         setTimeout(() => {
             document.getElementById('scare-layer').style.display = 'flex';
             document.getElementById('death-content').innerHTML = `
                 <p><strong>SUBJECT:</strong> ${playerName}</p>
-                <p><strong>CATEGORY:</strong> ${scene.t}</p>
-                <p><strong>WEAPON:</strong> ${scene.w}</p>
-                <p><strong>CAUSE:</strong> <span class="medical-bold">${scene.c}</span></p>
-                <p><strong>DETAIL:</strong> ${scene.d.replace('${playerName}', playerName)}</p>
-                <div style="border-top:1px solid #000; padding-top:15px; font-size:0.75rem;">Status: BIOLOGICAL_CLEANUP_COMPLETE</div>
+                <p><strong>TYPE:</strong> ${scene.t}</p>
+                <p><strong>CAUSE:</strong> ${scene.c}</p>
+                <p><strong>LOG:</strong> ${scene.d}</p>
             `;
         }, 200);
     }
@@ -173,7 +185,7 @@
     async function triggerDiary() {
         document.getElementById('sfx-fire').play();
         const box = document.getElementById('doc-content');
-        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.4;"></div>`;
+        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6;"></div>`;
         const content = [
             "【 VICTOR'S PRIVATE JOURNAL 】",
             "那場火災是我送給 Veil 家族的『歡迎儀式』。",
@@ -188,7 +200,6 @@
             await new Promise(r=>setTimeout(r, 1200));
         }
     }
-    function resetIdleTimer() {}
 </script>
 </body>
 </html>

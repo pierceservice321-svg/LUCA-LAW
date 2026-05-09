@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_REPORT_REVISION_V4</title>
+    <title>FILE_REPORT_REVISION_V5</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
@@ -22,16 +22,21 @@
         /* 實驗報告正文 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
-            padding: 70px 60px; box-sizing: border-box; display: none; color: var(--ink); 
+            padding: 50px 40px; box-sizing: border-box; display: none; color: var(--ink); 
             position: relative; z-index: 5; margin: 5vh auto; overflow-y: auto;
             border: 1px solid #777; box-shadow: inset 0 0 100px rgba(0,0,0,0.1), 0 0 80px rgba(0,0,0,0.9);
         }
         .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
-        /* 密碼輸入面板 - 縮減高度 */
-        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 30px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid var(--accent); }
-        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3rem; outline: none; letter-spacing: 20px; font-family: 'Courier Prime'; line-height: 1; }
+        /* 密碼輸入面板 - 高度優化 */
+        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 20px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid var(--accent); }
+        #pass-field { 
+            width: 100%; background: none; border: none; color: #fff; text-align: center; 
+            font-size: 2.5rem; outline: none; letter-spacing: 15px; 
+            font-family: 'Courier Prime'; line-height: 1.2;
+        }
+        #pass-field::placeholder { color: #555; opacity: 1; letter-spacing: 15px; }
 
         /* 結局圖層 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; }
@@ -86,7 +91,7 @@
 </div>
 
 <div id="input-panel">
-    <input type="text" id="pass-field" autocomplete="off">
+    <input type="text" id="pass-field" autocomplete="off" placeholder="">
 </div>
 
 <div id="scare-layer">
@@ -133,21 +138,17 @@
         };
     }
 
-    // 核心優化：使用 Value 預填提示線條，並縮小輸入框
     function openInput(id) { 
-        document.getElementById('input-panel').style.display='block'; 
+        const panel = document.getElementById('input-panel');
         const field = document.getElementById('pass-field');
+        panel.style.display='block'; 
         
-        let lines = "";
-        if(id === '1102') lines = "----";
-        else if(id === 'V') lines = "-";
-        else if(id === 'VICTOR') lines = "------";
+        // 修正：使用更明顯的 placeholder 字元
+        if(id === '1102') field.placeholder = "_ _ _ _";
+        else if(id === 'V') field.placeholder = "_";
+        else if(id === 'VICTOR') field.placeholder = "_ _ _ _ _ _";
         
-        field.value = lines;
-        field.style.color = "#444"; // 預填線條設為暗灰色
-        field.select(); // 自動全選，使用者一打字就會蓋掉線條
-        
-        field.oninput = () => { field.style.color = "#fff"; }; // 打字時變回白色
+        field.value = "";
         field.focus(); 
         window.targetKey = id; 
     }
@@ -170,6 +171,7 @@
             }
             document.getElementById('input-panel').style.display='none'; 
             e.target.value="";
+            e.target.placeholder=""; // 關閉時清空
         }
     }
 
@@ -193,8 +195,12 @@
 
     async function triggerDiary() {
         pageSFX.play();
-        const box = document.getElementById('doc-content');
-        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
+        // 關鍵：清空整個文件內容，防止標題殘留
+        const doc = document.getElementById('doc');
+        doc.innerHTML = `
+            <div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>
+        `;
+        
         const content = [
             "【VICTOR'S PRIVATE JOURNAL】",
             "那場絕美火災是我送給 Veil 家族的『歡迎儀式』，我看著火舌吞噬宅邸就想哈哈大笑。",
@@ -203,9 +209,15 @@
             "他死守著『V』徽章在泥坑掙扎的模樣真是愚蠢，他也許以為還有人會來救他，其實將是我會出現在那又破又髒的孤兒院。",
             "只要他還在痛苦中掙扎，就是我最完美的標本。我真希望快點聽見他叫我『父親』。"
         ];
+        
+        const diaryBox = document.getElementById('final-diary');
         for(let text of content) {
-            let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
-            for(let char of text) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
+            let p = document.createElement('p'); 
+            diaryBox.appendChild(p);
+            for(let char of text) { 
+                p.innerHTML += char; 
+                await new Promise(r=>setTimeout(r, 60)); 
+            }
             await new Promise(r=>setTimeout(r, 1000));
         }
     }

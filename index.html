@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_TERMINATION_PROTOCOL</title>
+    <title>FILE_REPORT_SURVIVAL</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* 門戶介面 */
+        /* 認證門戶 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
-        /* 詩歌層 */
+        /* 詩篇過場 */
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
         #poem-area { margin-top: 5vh; line-height: 3; letter-spacing: 8px; color: #f0f0f0; text-align: center; font-family: 'Crimson Pro', serif; font-style: italic; }
         .poem-line { min-height: 1.5em; margin-bottom: 15px; opacity: 0; transition: opacity 0.8s; font-size: 1.3rem; }
 
-        /* 報告文件 */
+        /* 實驗報告正文 */
         .report-sheet { 
             width: 90%; max-width: 750px; height: 90vh; background: var(--paper); 
             padding: 70px 60px; box-sizing: border-box; display: none; color: var(--ink); 
@@ -29,7 +29,7 @@
         .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
-        /* 輸入介面 */
+        /* 密碼輸入面板 */
         #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 70px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid var(--accent); }
         #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3.5rem; outline: none; letter-spacing: 25px; font-family: 'Courier Prime'; }
 
@@ -71,12 +71,12 @@
     <div id="doc-content">
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>施暴者將個案推入泥坑中，其中一名領頭者踩住了個案的左手背反覆碾壓。個案並未呼救。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄的<strong>破布偶</strong>。</p>
+            <p>個案於暴雨午後被三名院生強行帶往北側集水區。施暴者將個案推入泥坑中，其中一名領頭者踩住了個案的左手背反覆碾壓。個案並未呼救。</p>
         </div>
 
         <div class="section-box">
             <h2>二、 關鍵物證：血染的家徽</h2>
-            <p>個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
+            <p>在受暴過程中，個案始終死死捏著右手心裡的一枚家徽扣。該扣具上刻有顯眼的 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記。指縫滲出混著泥水的血跡，個案仍未鬆手。</p>
         </div>
 
         <div class="section-box">
@@ -102,24 +102,25 @@
     let solved = {"1102":false, "V":false, "VICTOR":false};
     let errors = 0;
 
+    const gunshotSFX = document.getElementById('sfx-gunshot');
+    const footstepSFX = document.getElementById('sfx-footstep');
+    const rainSFX = document.getElementById('sfx-rain');
+    const pageSFX = document.getElementById('sfx-page');
+
     function initSystem() {
         const val = document.getElementById('user-name').value.trim();
         if(!val) return;
         playerName = val;
         
-        // 1. 播放雨聲
-        const rain = document.getElementById('sfx-rain');
-        rain.volume = 0.5;
-        rain.play();
+        // 啟動環境音
+        rainSFX.volume = 0.4;
+        rainSFX.play();
 
-        // 2. 暴力解鎖槍聲音訊 (核心修正：強制瀏覽器紀錄播放行為)
-        const gunshot = document.getElementById('sfx-gunshot');
-        gunshot.volume = 0.01;
-        gunshot.play().then(() => {
-            gunshot.pause();
-            gunshot.currentTime = 0;
-            gunshot.volume = 1.0; 
-        }).catch(e => console.log("Sound unlock required action"));
+        // 預熱所有音效，確保瀏覽器註冊成功
+        [gunshotSFX, footstepSFX, pageSFX].forEach(sfx => {
+            sfx.volume = 0;
+            sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.volume = 1; });
+        });
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
@@ -132,7 +133,7 @@
         for(let text of lines) {
             let d = document.createElement('div'); d.className = "poem-line"; area.appendChild(d);
             for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 60)); }
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 600));
         }
         
         const hint = document.createElement('div');
@@ -141,7 +142,7 @@
         area.appendChild(hint);
 
         document.getElementById('gate-screen').onclick = () => {
-            document.getElementById('sfx-page').play();
+            pageSFX.play();
             document.getElementById('gate-screen').style.display='none';
             document.getElementById('doc').style.display='block';
         };
@@ -162,19 +163,15 @@
                 solved[window.targetKey] = true;
                 document.getElementById('gap-' + window.targetKey).innerHTML = val;
                 document.getElementById('gap-' + window.targetKey).className = "solved";
-                document.getElementById('sfx-page').play();
+                pageSFX.play();
                 if(Object.values(solved).every(v => v)) setTimeout(triggerDiary, 800);
             } else {
                 errors++;
-                // 播放腳步聲警告
-                const foot = document.getElementById('sfx-footstep');
-                foot.currentTime = 0;
-                foot.play();
-
-                if(errors >= 3) { // 修正為錯誤三次觸發
+                footstepSFX.currentTime = 0;
+                footstepSFX.play();
+                
+                if(errors >= 3) {
                     triggerDeath();
-                } else {
-                    console.log("錯誤次數: " + errors);
                 }
             }
             document.getElementById('input-panel').style.display='none'; 
@@ -183,37 +180,36 @@
     }
 
     function triggerDeath() {
-        const gunshot = document.getElementById('sfx-gunshot');
+        // 核心邏輯：先強制執行音訊播放，不等待視覺畫面
+        gunshotSFX.pause(); // 防止重複疊加
+        gunshotSFX.currentTime = 0; 
+        gunshotSFX.volume = 1.0;
         
-        // 核心修正：強制重新加載資源並播放
-        gunshot.load(); 
-        gunshot.volume = 1.0;
+        // 使用 Promise 確認播放
+        const playGunshot = gunshotSFX.play();
         
-        const playPromise = gunshot.play();
-
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
-                console.log("槍聲成功播放");
-            }).catch(error => {
-                console.log("槍聲被瀏覽器攔截:", error);
+        if (playGunshot !== undefined) {
+            playGunshot.then(() => {
+                // 槍聲響起後，延遲極短時間顯示死亡畫面
+                setTimeout(() => {
+                    document.getElementById('scare-layer').style.display = 'flex';
+                    document.getElementById('death-content').innerHTML = `
+                        <p><strong>SUBJECT:</strong> ${playerName}</p>
+                        <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷 (Gunshot Wound)</p>
+                        <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
+                        <p><strong>OBSERVATION:</strong><br>執行者：Victor。在第三次密碼驗證失敗後執行清理程序。子彈貫穿額前，受試者即刻喪失生命體徵。</p>
+                    `;
+                }, 100);
+            }).catch(e => {
+                console.log("槍聲播放被阻擋，嘗試備用方案...");
+                // 備用方案：直接顯示畫面
+                document.getElementById('scare-layer').style.display = 'flex';
             });
         }
-
-        // 視覺效果延遲出現，確保聽覺先行
-        setTimeout(() => {
-            document.getElementById('scare-layer').style.display = 'flex';
-            document.getElementById('death-content').innerHTML = `
-                <p><strong>REPORT_ID:</strong> ERR_EXP_FAIL</p>
-                <p><strong>SUBJECT:</strong> ${playerName}</p>
-                <p><strong>DIAGNOSIS:</strong> 顱腦槍械損傷 (Gunshot Wound)</p>
-                <hr style="border:0; border-top:1px solid #ddd; margin:15px 0;">
-                <p><strong>OBSERVATION:</strong><br>執行者：Victor。在第三次密碼驗證失敗後，執行清理程序。子彈貫穿枕骨，受試者立即喪失意識。</p>
-            `;
-        }, 100);
     }
 
     async function triggerDiary() {
-        document.getElementById('sfx-page').play();
+        pageSFX.play();
         const box = document.getElementById('doc-content');
         box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
         

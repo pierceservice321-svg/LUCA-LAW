@@ -39,7 +39,6 @@
 </head>
 <body>
 
-<!-- 音訊資源 -->
 <audio id="sfx-rain" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502554248154579065/Rain_Sounds_15_seconds_soundtrack.mp3?ex=6a002230&is=69fed0b0&hm=4a5d87db0a4bbd2c3a9a5f9e26ccbe9444bd943a0c81e9cfac9ebcf8f611e862&"></audio> 
 <audio id="sfx-fire" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502552548303962192/Fire_Crackling_-_Sound_Effect_HQ.mp3?ex=6a00209b&is=69fecf1b&hm=765827b3afee9dde88274c1a4e489d8f32ead7f82f7737713c7a1d9cb1f7ff36&"></audio>
 <audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&"></audio>
@@ -57,10 +56,12 @@
 </div>
 
 <div class="report-sheet" id="doc">
-    <h1>EXPERIMENTAL PATHOLOGY REPORT</h1>
-    <div id="doc-content">
+    <h1 id="report-title">EXPERIMENTAL PATHOLOGY REPORT</h1>
+    <div id="subject-header">
         <p><strong>SUBJECT:</strong> LUCA / <strong>BIRTH:</strong> <span id="gap-1102" class="input-gap" onclick="openInput('1102')">████</span></p>
-        
+    </div>
+    
+    <div id="doc-content">
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
             <p>個案於暴雨午後被三名院生強行帶往北側集水區。觀測發現，個案在整個搬運過程中未表現出任何掙扎或求救意圖，瞳孔呈現持續性放大。施暴者將個案推入積水的泥坑中，其中一名領頭者踩住了個案的左手背，在混濁的泥濘中反覆碾壓。當掌骨發出明顯的摩擦聲與悶響時，個案並未呼救，其意識已進入深層解離狀態。</p>
@@ -100,10 +101,9 @@
         if(!val) return;
         playerName = val;
         
-        // 立即啟動音軌 (利用 ACCESS 的點擊互動權限)
         const rain = document.getElementById('sfx-rain');
-        rain.volume = 1.0;
-        rain.play().catch(e => console.log("Audio play failed", e));
+        rain.volume = 0.7;
+        rain.play().catch(e => console.log("Audio Error", e));
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
@@ -113,11 +113,7 @@
     async function startPoem() {
         const area = document.getElementById('poem-area');
         area.innerHTML = ""; 
-        // 詩歌文本修正：更簡短
-        const lines = [
-            "FATHER IS VICTOR",
-            "Is your only truth"
-        ];
+        const lines = ["FATHER IS VICTOR", "Is your only truth"];
         for(let text of lines) {
             let d = document.createElement('div'); d.className = "poem-line"; area.appendChild(d);
             for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 60)); }
@@ -130,7 +126,7 @@
         area.appendChild(hint);
 
         document.getElementById('gate-screen').onclick = () => {
-            document.getElementById('sfx-page').play().catch(()=>{});
+            document.getElementById('sfx-page').play();
             document.getElementById('gate-screen').style.display='none';
             document.getElementById('doc').style.display='block';
         };
@@ -151,17 +147,22 @@
                 solved[window.targetKey] = true;
                 document.getElementById('gap-' + window.targetKey).innerHTML = val;
                 document.getElementById('gap-' + window.targetKey).className = "solved";
-                // 答對時播放輕微翻頁聲
-                document.getElementById('sfx-page').currentTime = 0;
-                document.getElementById('sfx-page').play().catch(()=>{});
                 
-                if(Object.values(solved).every(v => v)) triggerDiary();
+                const pageSound = document.getElementById('sfx-page');
+                pageSound.currentTime = 0;
+                pageSound.play();
+                
+                if(Object.values(solved).every(v => v)) {
+                    setTimeout(triggerDiary, 800);
+                }
             } else {
                 errors++;
-                document.getElementById('sfx-footstep').currentTime = 0; document.getElementById('sfx-footstep').play().catch(()=>{});
+                document.getElementById('sfx-footstep').currentTime = 0; 
+                document.getElementById('sfx-footstep').play();
                 if(errors >= 2) triggerDeath();
             }
-            document.getElementById('input-panel').style.display='none'; e.target.value="";
+            document.getElementById('input-panel').style.display='none'; 
+            e.target.value="";
         }
     }
 
@@ -169,10 +170,17 @@
         const scenarios = [
             { t: "槍械處決", s: "sfx-gunshot", c: "額葉穿孔", d: "VICTOR 對著你的眉心扣下扳機。" },
             { t: "火焰焚毀", s: "sfx-fire", c: "組織碳化", d: "出口被鎖死，你在烈火中化為灰燼。" },
+            { t: "腳步逼近", s: "sfx-footstep", c: "心臟驟停", d: "暗影中的腳步在你耳後停下，隨後是一片漆黑。" },
+            { t: "生化清理", s: "sfx-rain", c: "心室顫動", d: "高濃度藥劑注入，你的心跳在 VICTOR 的注視下歸零。" },
+            { t: "窒息清除", s: "sfx-footstep", c: "呼吸停擺", d: "一雙冰冷的手從後方扼住了你的喉嚨。" },
+            { t: "槍械連發", s: "sfx-gunshot", c: "多處臟器損傷", d: "VICTOR 毫不留情地清空了彈匣。" },
+            { t: "密室缺氧", s: "sfx-rain", c: "腦部缺氧", d: "實驗室氣壓驟降，你抓撓著牆壁直到失去意識。" },
+            { t: "致命重擊", s: "sfx-footstep", c: "顱內出血", d: "沉重的金屬管擊碎了你的頭蓋骨。" },
+            { t: "高溫熱輻射", s: "sfx-fire", c: "熱休克", d: "焚化爐的門緩緩關閉，這是你最後看見的畫面。" },
             { t: "泥池沈溺", s: "sfx-rain", c: "異物吸入窒息", d: "你被重新按入集水區的泥坑，這一次，沒有人鬆手。" }
         ];
         const sc = scenarios[Math.floor(Math.random()*scenarios.length)];
-        document.getElementById(sc.s).currentTime = 0; document.getElementById(sc.s).play().catch(()=>{});
+        document.getElementById(sc.s).currentTime = 0; document.getElementById(sc.s).play();
         setTimeout(() => {
             document.getElementById('scare-layer').style.display = 'flex';
             document.getElementById('death-content').innerHTML = `<p><strong>SUBJECT:</strong> ${playerName}</p><p><strong>TYPE:</strong> ${sc.t}</p><p><strong>CAUSE:</strong> ${sc.c}</p><p><strong>LOG:</strong> ${sc.d}</p>`;
@@ -180,10 +188,16 @@
     }
 
     async function triggerDiary() {
-        document.getElementById('sfx-page').play().catch(()=>{});
-        document.getElementById('sfx-fire').play().catch(()=>{});
+        const pageSound = document.getElementById('sfx-page');
+        pageSound.currentTime = 0;
+        pageSound.play();
+        document.getElementById('sfx-fire').play();
+
+        document.getElementById('report-title').style.display = 'none';
+        document.getElementById('subject-header').style.display = 'none';
         const box = document.getElementById('doc-content');
-        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6;"></div>`;
+        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
+        
         const content = [
             "【VICTOR'S PRIVATE JOURNAL】",
             "那場絕美火災是我送給 Veil 家族的『歡迎儀式』，我看著火舌吞著那棟宅邸就想大笑。",
@@ -192,9 +206,14 @@
             "哈，他死守著『V』徽章，在泥坑裡掙扎的模樣，他以為 V 那是救贖，其實將是沒用的枷鎖。",
             "只要他還在痛苦中掙扎，就是我最完美的標本，我真希望早點聽到他叫我『父親』。"
         ];
+        
         for(let text of content) {
-            let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
-            for(let char of text) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
+            let p = document.createElement('p'); 
+            document.getElementById('final-diary').appendChild(p);
+            for(let char of text) { 
+                p.innerHTML += char; 
+                await new Promise(r=>setTimeout(r, 60)); 
+            }
             await new Promise(r=>setTimeout(r, 1200));
         }
     }

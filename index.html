@@ -43,7 +43,7 @@
 </head>
 <body>
 
-<!-- 音訊資源 -->
+<!-- 音訊資源 (穩定路徑) -->
 <audio id="sfx-rain" loop src="https://assets.mixkit.co/active_storage/sfx/2452/2452-preview.mp3"></audio> 
 <audio id="sfx-fire" loop src="https://assets.mixkit.co/active_storage/sfx/678/678-preview.mp3"></audio>
 <audio id="sfx-gunshot" src="https://assets.mixkit.co/active_storage/sfx/1678/1678-preview.mp3"></audio>
@@ -96,21 +96,29 @@
         if(!val) return;
         playerName = val;
 
-        // 喚醒所有音軌 (核心修復)
+        // 核心解法：利用使用者點擊按鈕的瞬間「解鎖」所有音訊對象
         const audios = document.querySelectorAll('audio');
-        audios.forEach(a => { a.play().then(() => a.pause()).catch(() => {}); });
+        audios.forEach(a => { 
+            a.muted = false;
+            a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(() => {}); 
+        });
 
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
         
+        // 啟動背景雨聲
         const rain = document.getElementById('sfx-rain');
-        rain.volume = 0.5; rain.play();
+        rain.volume = 0.5; 
+        rain.play().catch(() => {
+            // 如果還是被擋，則綁定到視窗點擊事件作為後備
+            window.addEventListener('click', () => { rain.play(); }, { once: true });
+        });
+
         startPoem();
     }
 
     async function startPoem() {
         const area = document.getElementById('poem-area');
-        // 加入了 VICTOR 的詩歌
         const lines = [
             "VICTOR lighting the pyre", 
             "The flame consumes the secret", 
@@ -129,7 +137,6 @@
     }
 
     function openInput(id) { 
-        document.getElementById('sfx-rain').play();
         document.getElementById('input-panel').style.display='block'; 
         const field = document.getElementById('pass-field');
         field.placeholder = "-".repeat(id === 'VICTOR' ? 6 : id.length); 
@@ -147,7 +154,8 @@
                 if(Object.values(solved).every(v => v)) triggerDiary();
             } else {
                 errors++;
-                document.getElementById('sfx-footstep').play();
+                const foot = document.getElementById('sfx-footstep');
+                foot.currentTime = 0; foot.play();
                 if(errors >= 2) triggerDeath();
             }
             document.getElementById('input-panel').style.display='none'; e.target.value="";

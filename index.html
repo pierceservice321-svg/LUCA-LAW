@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_REPORT_SURVIVAL</title>
+    <title>FILE_REPORT_REVISION_0112</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
@@ -13,6 +13,7 @@
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
+        .enter-btn:hover { color: #fff; border-color: #eee; background: rgba(255,255,255,0.1); }
 
         /* 詩篇過場 */
         #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
@@ -44,7 +45,6 @@
 </head>
 <body>
 
-<!-- 音訊資源 -->
 <audio id="sfx-gunshot" preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&" type="audio/mpeg">
 </audio>
@@ -71,7 +71,7 @@
     <div id="doc-content">
         <div class="section-box">
             <h2>一、 現場觀測紀錄：暴力行為</h2>
-            <p>個案於暴雨午後被三名院生強行帶往北側集水區。施暴者將個案推入泥坑中，其中一名領頭者踩住了個案的左手背反覆碾壓。個案並未呼救。</p>
+            <p>個案於暴雨午後被三名院生強行帶往北側集水區。個案並未呼救。施暴者不斷宣稱個案根本不是人類，僅僅是一個在火災中被遺棄的<strong>破布偶</strong>。</p>
         </div>
 
         <div class="section-box">
@@ -112,11 +112,10 @@
         if(!val) return;
         playerName = val;
         
-        // 啟動環境音
         rainSFX.volume = 0.4;
         rainSFX.play();
 
-        // 預熱所有音效，確保瀏覽器註冊成功
+        // 預熱所有音效
         [gunshotSFX, footstepSFX, pageSFX].forEach(sfx => {
             sfx.volume = 0;
             sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.volume = 1; });
@@ -148,10 +147,18 @@
         };
     }
 
+    // 修復底線消失的問題
     function openInput(id) { 
         document.getElementById('input-panel').style.display='block'; 
         const field = document.getElementById('pass-field');
-        field.focus(); window.targetKey = id; 
+        
+        // 根據不同欄位設定底線數量
+        if(id === '1102') field.placeholder = "----";
+        else if(id === 'V') field.placeholder = "-";
+        else if(id === 'VICTOR') field.placeholder = "------";
+        
+        field.focus(); 
+        window.targetKey = id; 
     }
 
     document.getElementById('pass-field').onkeypress = (e) => {
@@ -180,17 +187,14 @@
     }
 
     function triggerDeath() {
-        // 核心邏輯：先強制執行音訊播放，不等待視覺畫面
-        gunshotSFX.pause(); // 防止重複疊加
+        gunshotSFX.pause(); 
         gunshotSFX.currentTime = 0; 
         gunshotSFX.volume = 1.0;
         
-        // 使用 Promise 確認播放
         const playGunshot = gunshotSFX.play();
         
         if (playGunshot !== undefined) {
             playGunshot.then(() => {
-                // 槍聲響起後，延遲極短時間顯示死亡畫面
                 setTimeout(() => {
                     document.getElementById('scare-layer').style.display = 'flex';
                     document.getElementById('death-content').innerHTML = `
@@ -201,8 +205,6 @@
                     `;
                 }, 100);
             }).catch(e => {
-                console.log("槍聲播放被阻擋，嘗試備用方案...");
-                // 備用方案：直接顯示畫面
                 document.getElementById('scare-layer').style.display = 'flex';
             });
         }

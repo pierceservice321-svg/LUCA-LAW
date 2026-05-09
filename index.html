@@ -6,10 +6,10 @@
     <title>FILE_0112_LUCA</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap');
-        :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; --death: #1a120b; }
+        :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* 窺視者背景：使用你提供的 Medium 圖片風格 */
+        /* 窺視者背景 */
         #watcher-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/contain no-repeat #000; 
@@ -17,21 +17,21 @@
             filter: brightness(0.4) contrast(1.5);
         }
 
-        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 1s; }
-        #poem-area { line-height: 2.8; letter-spacing: 3px; color: #888; text-align: center; font-style: italic; padding: 20px; font-size: 1.1rem; }
+        #gate-screen { position: fixed; z-index: 1000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
+        #poem-area { line-height: 2.8; letter-spacing: 3px; color: #888; text-align: center; font-style: italic; padding: 20px; font-size: 1.1rem; min-height: 250px; }
 
         .report-sheet { 
             width: 90%; max-width: 500px; height: 85vh; background: var(--paper); 
             padding: 40px 30px; box-sizing: border-box; display: none; color: var(--ink); 
-            position: relative; z-index: 5; transition: 2.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto;
-            box-shadow: 0 0 60px rgba(0,0,0,1); border: 1px solid #999;
+            position: relative; z-index: 5; transition: 2s; overflow-y: auto;
+            box-shadow: 0 0 60px #000;
         }
-        .report-sheet.burned { background: #050505 !important; color: #900 !important; border: 1px solid #400; filter: sepia(0.5) contrast(1.5); }
+        .report-sheet.burned { background: #050505 !important; color: #900 !important; filter: sepia(0.5) contrast(1.5); }
 
-        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: var(--death); z-index: 999; transition: 2s cubic-bezier(0.7, 0, 0.3, 1); opacity: 0.98; }
+        #mud-up { position: fixed; bottom: -100%; left: 0; width: 100%; height: 100%; background: #1a120b; z-index: 999; transition: 2s ease-in; opacity: 0.98; }
 
         .input-gap { border-bottom: 2px solid var(--accent); cursor: pointer; font-weight: bold; padding: 0 5px; transition: 0.3s; }
-        .active-hint { animation: pulse 1.2s infinite; color: var(--accent); text-shadow: 0 0 5px rgba(128,0,0,0.5); }
+        .active-hint { animation: pulse 1.2s infinite; color: var(--accent); }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
 
         #final-overlay {
@@ -42,7 +42,7 @@
         }
 
         #input-panel { position: fixed; bottom: 0; width: 100%; background: #0a0a0a; padding: 35px; box-sizing: border-box; display: none; z-index: 2000; border-top: 1px solid var(--accent); }
-        input { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2.2rem; outline: none; font-family: 'Noto Serif TC', serif; letter-spacing: 5px; }
+        input { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2.2rem; outline: none; font-family: serif; }
     </style>
 </head>
 <body onclick="handleInteraction()">
@@ -51,27 +51,20 @@
 <div id="mud-up"></div>
 
 <div id="final-overlay">
-    <h2 id="final-title" style="letter-spacing: 12px; font-size: 1.6rem; margin-bottom: 10px;"></h2>
-    <p id="final-sub" style="font-size: 0.95rem; color: #444; line-height: 1.6;"></p>
-    <p style="font-size: 0.6rem; color: #222; margin-top: 60px; letter-spacing: 2px;">[ 重新整理網頁以再次連結 ]</p>
+    <h2 id="final-title" style="letter-spacing: 12px;"></h2>
+    <p id="final-sub" style="font-size: 0.95rem; color: #444;"></p>
 </div>
 
 <div id="gate-screen">
     <div id="poem-area"></div>
-    <p style="color:#222; font-size:0.7rem; margin-top:30px; letter-spacing:4px;">[ CLICK TO RECALL ]</p>
+    <div id="click-prompt" style="color:#222; font-size:0.7rem; letter-spacing:5px; margin-top:20px;">[ CLICK TO WITNESS ]</div>
 </div>
 
 <div class="report-sheet" id="doc">
-    <h1 style="font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center; letter-spacing: 2px;">【臨床鑑定報告：0112 號個案行為觀測】</h1>
-    <div style="font-size: 0.75rem; border-bottom: 1px solid #999; margin-bottom: 25px; padding-bottom: 8px; color: #555;">
-        檔案編號：0112-L (Veil, Luca) | 記錄時間：14:00 - 20:00 (共計 6 小時)
-    </div>
-    
-    <p style="font-size: 0.9rem; line-height: 2;">個案被三名院生強行拖至北側集水區。霸凌者踩住了個案的左手背，將全身重量壓在上面，在泥濘中反覆碾壓。個案並未求饒，僅在骨骼發出悶響時，眼球出現劇烈的震顫，隨後便陷入更深的解離狀態。</p>
-    
-    <p style="font-size: 0.9rem; line-height: 2;">霸凌者在施暴過程中持續嘲笑其為「燒焦的孤兒」。他們大聲宣稱個案根本不是人類，只是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">? ? ? ?</span>。</p>
-
-    <p style="font-size: 0.9rem; line-height: 2;">他就像一個壞掉的零件，在暴雨中靜靜地等待崩潰。那枚被他死死捏在右手心的家徽扣 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">?</span>，尖銳的邊緣已經深深嵌入他的肉裡，那是他在這場霸凌中唯一與現實連結的證據。</p>
+    <h1 style="font-size: 1rem; border-bottom: 2px solid #333; padding-bottom: 10px; text-align: center;">臨床鑑定報告：0112 號個案</h1>
+    <p style="font-size: 0.9rem; line-height: 2;">...在泥濘中反覆碾壓。當骨骼發出悶響時，眼球出現劇烈的震顫，隨後便陷入更深的解離狀態。</p>
+    <p style="font-size: 0.9rem; line-height: 2;">霸凌者大聲宣稱個案根本不是人類，只是一個在火災中被遺棄、沒有靈魂的 <span class="input-gap" id="gap-DOLL" onclick="openInput('DOLL')">? ? ? ?</span>。</p>
+    <p style="font-size: 0.9rem; line-height: 2;">那枚捏在右手心的家徽扣 <span class="input-gap active-hint" id="gap-V" onclick="openInput('V')">?</span>，是他在暴雨中唯一捏碎的真實，也是他在霸凌中唯一與現實連結的證據。</p>
 </div>
 
 <div id="input-panel">
@@ -79,24 +72,28 @@
 </div>
 
 <script>
+    // 修正了 Veil 的 V 大寫
     const lines = [
         "The fire consumes the secret's pale,",
-        "Lifting up the crimson veil.",
+        "Lifting up the crimson Veil.",
         "A single letter etched in steel,",
         "Is all the truth he'll ever feel."
     ];
-    let started = false, solved = 0, errors = 0, idleTimer, audioCtx;
+    let started = false, typing = false, solved = 0, errors = 0, idleTimer, audioCtx;
 
     function handleInteraction() {
         if (!started) {
             started = true;
-            initAudioEngine();
+            document.getElementById('click-prompt').style.opacity = '0';
+            initAudio();
             startTypewriter();
         }
         resetIdle();
     }
 
     async function startTypewriter() {
+        if (typing) return;
+        typing = true;
         const area = document.getElementById('poem-area');
         for (let line of lines) {
             for (let char of line) { 
@@ -120,18 +117,16 @@
 
     function resetIdle() {
         clearTimeout(idleTimer);
-        // 若報告書顯示中且未解開密碼，啟動 10 秒靜止檢測
         if (document.getElementById('doc').style.display === 'block' && solved < 2) {
             idleTimer = setTimeout(triggerGazer, 10000); 
         }
     }
 
     function triggerGazer() {
-        document.getElementById('watcher-bg').style.opacity = '0.8';
-        document.getElementById('doc').style.opacity = '0.15';
-        document.getElementById('doc').style.filter = 'blur(12px)';
-        document.getElementById('doc').style.transform = 'scale(0.9)';
-        setTimeout(() => triggerFinal("THE GAZER", "當你凝視深淵時，深淵也在看著你。", "WATCHER"), 4500);
+        document.getElementById('watcher-bg').style.opacity = '0.9';
+        document.getElementById('doc').style.opacity = '0.1';
+        document.getElementById('doc').style.filter = 'blur(15px)';
+        setTimeout(() => triggerFinal("THE GAZER", "他在看著你。一直都在。", "WATCHER"), 4000);
     }
 
     function openInput(id) {
@@ -145,16 +140,14 @@
         if (e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
             if (val === window.targetKey) {
-                const el = document.getElementById('gap-' + window.targetKey);
-                el.innerText = window.targetKey;
-                el.classList.remove('active-hint');
-                el.style.color = 'var(--accent)';
+                document.getElementById('gap-' + window.targetKey).innerText = window.targetKey;
+                document.getElementById('gap-' + window.targetKey).classList.remove('active-hint');
                 solved++;
                 if (solved === 1) document.getElementById('gap-DOLL').classList.add('active-hint');
                 if (solved === 2) triggerFinal("RECALL SUCCESS", "現在，你終於看見他真正的樣子了。", "SUCCESS");
             } else {
                 errors++;
-                if (errors >= 3) triggerFinal("MEMORY DROWNED", "過多的錯誤干擾了回憶，他在泥濘中窒息了。", "DEATH");
+                if (errors >= 3) triggerFinal("CONNECTION LOST", "回憶已溺死在泥濘中。", "DEATH");
             }
             document.getElementById('input-panel').style.display = 'none';
             e.target.value = "";
@@ -165,55 +158,27 @@
         clearTimeout(idleTimer);
         if (type === "DEATH") document.getElementById('mud-up').style.bottom = '0';
         if (type === "SUCCESS") document.getElementById('doc').classList.add('burned');
-        
         setTimeout(() => {
             document.getElementById('final-title').innerText = title;
             document.getElementById('final-sub').innerText = sub;
             document.getElementById('final-overlay').style.display = 'flex';
-            if (type === "WATCHER") document.getElementById('final-overlay').style.background = "radial-gradient(circle, #200 0%, #000 100%)";
         }, 1800);
     }
 
-    // --- 音效合成系統：純粹的物理建模 ---
-    function initAudioEngine() {
+    function initAudio() {
+        if (audioCtx) return;
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // 雨聲：白噪音處理
         const bufferSize = audioCtx.sampleRate * 2;
         const rainBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
         const output = rainBuffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-
         const rainSource = audioCtx.createBufferSource();
-        rainSource.buffer = rainBuffer;
-        rainSource.loop = true;
-
+        rainSource.buffer = rainBuffer; rainSource.loop = true;
         const rainFilter = audioCtx.createBiquadFilter();
-        rainFilter.type = 'lowpass';
-        rainFilter.frequency.value = 1100;
-
-        const rainGain = audioCtx.createGain();
-        rainGain.gain.value = 0.12;
-
+        rainFilter.type = 'lowpass'; rainFilter.frequency.value = 1000;
+        const rainGain = audioCtx.createGain(); rainGain.gain.value = 0.08;
         rainSource.connect(rainFilter); rainFilter.connect(rainGain); rainGain.connect(audioCtx.destination);
         rainSource.start();
-
-        // 火聲：低頻隨機脈衝
-        const fireGain = audioCtx.createGain();
-        fireGain.gain.value = 0.04;
-        const fireFilter = audioCtx.createBiquadFilter();
-        fireFilter.type = 'bandpass'; fireFilter.frequency.value = 450;
-
-        const lfo = audioCtx.createOscillator();
-        lfo.type = 'sine'; lfo.frequency.value = 1.5;
-        const lfoGain = audioCtx.createGain();
-        lfoGain.gain.value = 0.03;
-        lfo.connect(lfoGain); lfoGain.connect(fireGain.gain);
-
-        const fireSource = audioCtx.createBufferSource();
-        fireSource.buffer = rainBuffer; fireSource.loop = true;
-        fireSource.connect(fireFilter); fireFilter.connect(fireGain); fireGain.connect(audioCtx.destination);
-        fireSource.start(); lfo.start();
     }
 </script>
 </body>

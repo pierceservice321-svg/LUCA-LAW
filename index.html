@@ -1,203 +1,187 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RECOVERY_SYSTEM_0112</title>
+    <title>FILE_0112_FINAL</title>
     <style>
-        :root { --paper: #c4c1b9; --ink: #1a1a1a; --accent: #8b0000; --shadow: rgba(0,0,0,0.8); }
-        
+        :root { --paper: #f0f0f0; --ink: #111; --accent: #7a0000; }
         body { 
-            background: #000; color: #dcdcdc; font-family: 'Courier New', Courier, monospace;
+            background: #000; color: #333; font-family: "Courier New", Courier, monospace;
             margin: 0; padding: 0; overflow: hidden; height: 100vh;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* 呼吸感陰影動畫 */
-        .vignette {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: radial-gradient(circle, transparent 30%, #000 120%);
-            pointer-events: none; z-index: 100; animation: breathe 5s infinite;
+        /* 5秒呼吸幻覺 */
+        #breathe-txt {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5.5rem; font-weight: 900; color: rgba(255,255,255,0.03);
+            text-transform: uppercase; letter-spacing: 25px; pointer-events: none; z-index: 5000;
+            opacity: 0; filter: blur(12px);
+        }
+        .breathe-on { animation: breathe-fade 2.8s ease-in-out forwards; }
+        @keyframes breathe-fade {
+            0% { opacity: 0; filter: blur(15px); scale: 0.9; }
+            50% { opacity: 0.15; filter: blur(3px); scale: 1.05; }
+            100% { opacity: 0; filter: blur(15px); scale: 1.15; }
         }
 
-        /* 檔案容器 */
-        .container { 
-            width: 90%; max-width: 380px; height: 80vh; position: relative; 
-            transition: transform 0.5s;
+        /* 醫療報告：白色掃描紙 */
+        .report-page {
+            width: 92%; max-width: 480px; height: 85vh;
+            background: var(--paper); padding: 45px 35px; box-sizing: border-box;
+            box-shadow: 0 0 50px #000; position: relative;
+            background-image: url('https://www.transparenttextures.com/patterns/dust.png');
+            border: 1px solid #aaa; transform: rotate(-0.3deg);
+            overflow-y: auto; transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), filter 1s;
         }
 
-        .file-page {
-            width: 100%; height: 100%; background: var(--paper); color: var(--ink);
-            padding: 30px; box-sizing: border-box; border-radius: 2px;
-            box-shadow: 0 0 50px #000; border-left: 10px solid #999;
-            position: absolute; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            background-image: url('https://www.transparenttextures.com/patterns/old-paper.png');
-            overflow-y: auto;
-        }
+        h1 { font-size: 1.1rem; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 25px; text-transform: uppercase; text-align: center; }
+        .section { margin-bottom: 20px; font-size: 0.85rem; line-height: 1.6; text-align: justify; }
+        .label { font-weight: bold; background: #ddd; padding: 0 3px; margin-right: 5px; }
 
-        .hidden { opacity: 0; transform: scale(0.9) rotate(-2deg); pointer-events: none; }
-
-        /* 黑色遮罩與提示 */
+        /* 解密遮罩 */
         .black-out {
-            background: #000; color: rgba(139, 0, 0, 0.5); /* 淡淡露出紅色的首字母 */
-            padding: 0 5px; cursor: pointer; transition: 0.3s;
-            border-radius: 2px; font-weight: bold; position: relative;
+            background: #111; color: transparent; padding: 0 8px; cursor: pointer; transition: 0.4s;
+            border-bottom: 1px solid var(--accent);
         }
-        .black-out::after { content: attr(data-hint); position: absolute; left: 5px; color: rgba(139, 0, 0, 0.3); }
+        .active-target { animation: hint-pulse 2s infinite; }
+        @keyframes hint-pulse { 0%, 100% { background: #000; } 50% { background: #220000; } }
 
-        /* 結局戳印動畫 */
-        #stamp {
-            position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%) scale(5);
-            border: 6px solid var(--accent); color: var(--accent);
-            padding: 10px 30px; font-size: 2.5rem; font-weight: bold;
-            opacity: 0; pointer-events: none; transition: 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.49);
-            z-index: 1000; transform: translate(-50%, -50%) rotate(-15deg) scale(3);
+        /* 死亡結局：視野收縮 */
+        #death-vignette {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, transparent 100%, #000 100%);
+            z-index: 10000; pointer-events: none; transition: 2.5s ease-in;
         }
+        .is-dead { background: radial-gradient(circle, transparent 0%, #000 0%) !important; }
 
-        /* 輸入法介面 */
-        #input-box {
-            position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95);
-            padding: 30px; box-sizing: border-box; display: none; z-index: 500;
-            border-top: 1px solid var(--accent);
+        #input-ui {
+            position: fixed; bottom: 0; width: 100%; background: #0a0a0a;
+            padding: 30px; box-sizing: border-box; display: none; z-index: 6000;
+            border-top: 2px solid var(--accent);
         }
         input {
-            width: 100%; background: transparent; border: none; color: var(--accent);
-            font-size: 2rem; text-align: center; outline: none; letter-spacing: 5px;
+            width: 100%; background: transparent; border: none; color: #fff;
+            font-size: 2rem; text-align: center; outline: none; letter-spacing: 10px;
         }
-
-        /* 動畫庫 */
-        @keyframes breathe { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
-        @keyframes shake { 0% { left:0; } 25% { left:-2px; } 50% { left:2px; } 100% { left:0; } }
-
-        .revealed-text { color: var(--accent); font-weight: bold; border-bottom: 1px solid var(--accent); }
     </style>
 </head>
 <body>
 
-<div class="vignette"></div>
+<div id="breathe-txt">Breathe</div>
+<div id="death-vignette"></div>
 
-<!-- 啟動層 -->
-<div id="overlay" style="position:fixed; z-index:1000; width:100%; height:100%; background:#000; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="init()">
-    <div style="text-align:center; letter-spacing:3px;">[ 檔案 0112：深度讀取 ]<br><br><small style="color:#444;">點擊螢幕解鎖</small></div>
+<div id="gate" style="position:fixed; z-index:9999; width:100%; height:100%; background:#000; color:#444; display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="unlock()">
+    [ ARCHIVE 0112: ENCRYPTED ]
 </div>
 
-<div class="container" id="main-container">
-    <div id="stamp">RECOVERED</div>
+<div class="report-page" id="paper-doc">
+    <h1>Observation: Luca Veil</h1>
 
-    <!-- 檔案一：火災報告 -->
-    <div id="page1" class="file-page">
-        <h2 style="font-size:1rem; border-bottom:1px solid #333;">MEMO: CASE_199X_FIRE</h2>
-        <p><strong>現場摘要：</strong></p>
-        <p>建築出口遭外部封鎖。火勢中心發現 Veil 夫婦遺骸，其死狀呈現極度扭曲的保護姿態。</p>
-        <p><strong>關鍵遺物：</strong></p>
-        <p>從幼兒（個案0112）手中取出的西裝扣，刻有被血跡覆蓋的字母：<span class="black-out" data-hint="V" onclick="ask('VEIL')">&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
-        <p><strong>目擊紀錄：</strong></p>
-        <p>案發當時，門外陰影處站著一個戴著 <span class="black-out" data-hint="M" onclick="ask('MASK')">&nbsp;&nbsp;&nbsp;&nbsp;</span> 的人影，個案對此展現異常沈默。</p>
-        <p id="p1-footer" style="margin-top:60px; font-size:0.7rem; color:#666; text-align:center;"><< 滑動翻閱日誌 >></p>
+    <div class="section">
+        <span class="label">SUBJECT:</span> 0112<br>
+        <span class="label">STATUS:</span> NON-REACTIVE / DISSOCIATIVE
     </div>
 
-    <!-- 檔案二：孤兒院日誌 -->
-    <div id="page2" class="file-page hidden">
-        <h2 style="font-size:1rem; border-bottom:1px solid #333;">LOG: SANTA_MARIA_0112</h2>
-        <p><strong>群體行為：</strong></p>
-        <p>今日發生集體霸凌，0112 被按在泥地中，其西裝殘片遭踐踏毀損。</p>
-        <p><strong>心理鑑定：</strong></p>
-        <p>個案並無流淚，亦無求救行為。他只是像個壞掉的 <span class="black-out" data-hint="D" onclick="ask('DOLL')">&nbsp;&nbsp;&nbsp;&nbsp;</span> 般注視著霸凌者。</p>
-        <p><strong>導師註記：</strong></p>
-        <p>他在黑暗中的視力似乎正在提升，這是不祥的徵兆。</p>
-        <p style="margin-top:60px; font-size:0.7rem; color:#666; text-align:center;"><< 滑動返回報告</p>
+    <div class="section">
+        <span class="label">RECORD 1:</span><br>
+        Sole survivor recovered from the <span class="black-out active-target" onclick="ask('VEIL')">V _ _ L</span> estate ruins. Patient was found gripping a family crest so firmly that the metal edges severed the tendons in his palm. No pain vocalization recorded.
+    </div>
+
+    <div class="section">
+        <span class="label">RECORD 2 (ABUSE LOG):</span><br>
+        Peers forcibly submerged the patient in a mud pit during a thunderstorm. One attacker crushed the patient's left hand under a boot, grinding it into the silt for several minutes. Patient remained in a state of suspended animation.
+    </div>
+
+    <div class="section">
+        <span class="label">VERBAL ANALYSIS:</span><br>
+        Attackers stuffed mud into the patient's mouth to silence him, calling him a 
+        <span class="black-out" id="target2" onclick="ask('DOLL')">D _ _ L</span>. 
+        Exposure duration: 6 hours. Physiological response: Sluggish blinking, shivering, eyes fixed on void.
+    </div>
+
+    <div class="section" style="border-top: 1px dashed #777; padding-top:10px; color:#555; font-style:italic;">
+        Conclusion: Subject has ceased to acknowledge external stimuli. He exists only in the space between breaths.
     </div>
 </div>
 
-<div id="input-box">
-    <input type="text" id="user-input" placeholder="RECALL...">
+<div id="input-ui">
+    <input type="text" id="pass-field" placeholder="...">
 </div>
 
 <script>
-    const sounds = {
-        bgm: new Audio('https://assets.mixkit.co/active_storage/sfx/2437/2437-preview.mp3'),
-        type: new Audio('https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3'),
-        stamp: new Audio('https://assets.mixkit.co/active_storage/sfx/1103/1103-preview.mp3')
-    };
+    // 音效資源
+    const rainSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2456/2456-preview.mp3');
+    const glitchSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2544/2544-preview.mp3');
+    const pageSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/1474/1474-preview.mp3'); // 紙張翻頁聲
+    
+    let fails = 0; let solved = 0; let current = "";
 
-    let targetCode = "";
-    let startTime = 0;
-
-    function init() {
-        document.getElementById('overlay').style.display = 'none';
-        sounds.bgm.loop = true;
-        sounds.bgm.play();
-        sounds.bgm.volume = 0.2;
-        startTime = Date.now();
+    function unlock() {
+        document.getElementById('gate').style.display = 'none';
+        rainSfx.loop = true; rainSfx.play(); rainSfx.volume = 0.5;
+        
+        // 5秒呼吸動畫
+        setInterval(() => {
+            const b = document.getElementById('breathe-txt');
+            b.classList.remove('breathe-on');
+            void b.offsetWidth;
+            b.classList.add('breathe-on');
+        }, 5000);
     }
 
     function ask(code) {
-        targetCode = code;
-        document.getElementById('input-box').style.display = 'block';
-        document.getElementById('user-input').focus();
-        sounds.type.play();
+        if(fails >= 3) return;
+        current = code;
+        document.getElementById('input-ui').style.display = 'block';
+        document.getElementById('pass-field').focus();
     }
 
-    // 結局邏輯補完
-    function triggerEnding(code) {
-        const time = (Date.now() - startTime) / 1000;
-        const inputArea = document.getElementById('input-box');
-        const stamp = document.getElementById('stamp');
-        
-        inputArea.style.display = 'none';
-        
-        // 視覺補完
-        const page = document.querySelector('.file-page:not(.hidden)');
-        const blanks = page.querySelectorAll('.black-out');
-        blanks.forEach(b => {
-            b.classList.remove('black-out');
-            b.classList.add('revealed-text');
-            b.innerText = code;
-        });
-
-        // 蓋章
-        setTimeout(() => {
-            stamp.style.opacity = "0.8";
-            stamp.style.transform = "translate(-50%, -50%) rotate(-15deg) scale(1)";
-            sounds.stamp.play();
-            if(navigator.vibrate) navigator.vibrate(200);
-            
-            // 插入最終鑑定報告
-            const result = document.createElement('div');
-            result.style.marginTop = "30px";
-            result.style.paddingTop = "10px";
-            result.style.borderTop = "2px solid var(--accent)";
-            result.style.color = var(--accent);
-            result.innerHTML = `<strong>【深度提取結果】</strong><br>${getStory(code, time)}`;
-            page.appendChild(result);
-        }, 500);
-    }
-
-    function getStory(code, time) {
-        if (code === "VEIL") return "回憶修復。個案記起了父母在火光中最後的推擠——那是為了讓他活下去。他重新獲得了身分的火種，鮮血依然溫熱。";
-        if (code === "MASK") return "危險覺醒。個案提取了當晚門後的視線。他記住了那個面具，並在意識深處與之共鳴。他不再是受害者，而是觀察者。";
-        if (code === "DOLL") return "生存代價。個案接受了孤兒院的定義，將自我封印在空殼之中。這是一場完美的遺忘，代價是靈魂的消逝。";
-        return "資料損毀。無法還原。";
-    }
-
-    // 滑動換頁
-    let startX = 0;
-    document.addEventListener('touchstart', e => startX = e.touches[0].clientX);
-    document.addEventListener('touchend', e => {
-        let diff = startX - e.changedTouches[0].clientX;
-        if(Math.abs(diff) > 50) {
-            document.getElementById('page1').classList.toggle('hidden');
-            document.getElementById('page2').classList.toggle('hidden');
-            sounds.stamp.play();
-        }
-    });
-
-    document.getElementById('user-input').addEventListener('keyup', e => {
+    document.getElementById('pass-field').addEventListener('keyup', e => {
         if(e.key === 'Enter') {
-            if(e.target.value.toUpperCase() === targetCode) triggerEnding(targetCode);
-            else { e.target.value = ""; document.getElementById('main-container').style.animation = "shake 0.2s 3"; }
+            const inputVal = e.target.value.toUpperCase();
+            if(inputVal === current) {
+                onSuccess();
+            } else {
+                onFail();
+            }
         }
     });
+
+    function onSuccess() {
+        pageSfx.play(); // 觸發紙張聲
+        document.getElementById('input-ui').style.display = 'none';
+        document.getElementById('pass-field').value = "";
+        
+        const el = Array.from(document.querySelectorAll('.black-out')).find(b => b.innerText.includes(current[0]));
+        el.innerText = current;
+        el.style.background = "transparent";
+        el.style.color = "var(--accent)";
+        el.classList.remove('active-target');
+
+        // 紙張微動特效
+        const doc = document.getElementById('paper-doc');
+        doc.style.transform = "rotate(0deg) scale(1.02)";
+        setTimeout(() => doc.style.transform = "rotate(-0.3deg) scale(1)", 500);
+
+        solved++;
+        if(solved === 1) document.getElementById('target2').classList.add('active-target');
+        if(solved === 2) doc.style.filter = "sepia(0.5) contrast(1.2)";
+    }
+
+    function onFail() {
+        glitchSfx.play();
+        fails++;
+        document.getElementById('pass-field').value = "";
+        if(fails >= 3) {
+            document.getElementById('input-ui').style.display = 'none';
+            document.getElementById('death-vignette').classList.add('is-dead');
+            setTimeout(() => {
+                document.body.innerHTML = "<div style='color:#700; text-align:center; margin-top:45vh; font-weight:bold; letter-spacing:10px;'>SESSION TERMINATED.</div>";
+            }, 2500);
+        }
+    }
 </script>
 </body>
 </html>

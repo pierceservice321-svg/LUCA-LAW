@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_REPORT_REVISION_FINAL</title>
+    <title>FILE_REPORT_REVISION_V4</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Courier+Prime&family=Crimson+Pro:italic,wght@600&display=swap');
         :root { --paper: #d1d1d1; --ink: #0a0a0a; --accent: #a00; }
@@ -12,10 +12,6 @@
         /* 認證門戶 */
         #name-gate { position: fixed; z-index: 2000; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .name-box { border: none; background: none; border-bottom: 2px solid #444; color: #fff; font-size: 1.5rem; text-align: center; outline: none; padding: 10px; width: 280px; margin-bottom: 20px; font-family: 'Courier Prime'; }
-        
-        /* 強制顯示 Placeholder 顏色 */
-        .name-box::placeholder { color: #444; letter-spacing: 5px; }
-        
         .enter-btn { background: none; border: 1px solid #555; color: #aaa; padding: 10px 40px; cursor: pointer; letter-spacing: 5px; transition: 0.4s; }
 
         /* 詩篇過場 */
@@ -33,12 +29,9 @@
         .input-gap { background: #000; color: #000; cursor: pointer; padding: 0 10px; border-bottom: 1px solid #444; display: inline-block; min-width: 60px; text-align: center; }
         .solved { background: transparent !important; color: var(--accent) !important; font-weight: bold; cursor: default; }
 
-        /* 密碼輸入面板 */
-        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.98); padding: 70px; box-sizing: border-box; display: none; z-index: 3000; border-top: 3px solid var(--accent); }
-        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3.5rem; outline: none; letter-spacing: 25px; font-family: 'Courier Prime'; }
-        
-        /* 讓輸入提示符號在深色背景下變亮 */
-        #pass-field::placeholder { color: #666; letter-spacing: 25px; opacity: 1; }
+        /* 密碼輸入面板 - 縮減高度 */
+        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); padding: 30px; box-sizing: border-box; display: none; z-index: 3000; border-top: 2px solid var(--accent); }
+        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 3rem; outline: none; letter-spacing: 20px; font-family: 'Courier Prime'; line-height: 1; }
 
         /* 結局圖層 */
         #scare-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100000; background: #080808; display: none; align-items: center; justify-content: center; }
@@ -51,7 +44,6 @@
 </head>
 <body>
 
-<!-- 音訊資源 -->
 <audio id="sfx-gunshot" preload="auto">
     <source src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3?ex=6a0012f7&is=69fec177&hm=9413cf0738b756957f8a9d3aaedd7e66ea2b55dbab9e62fa3828c1645cff53d8&" type="audio/mpeg">
 </audio>
@@ -118,15 +110,10 @@
         const val = document.getElementById('user-name').value.trim();
         if(!val) return;
         playerName = val;
-        
-        rainSFX.volume = 0.4;
-        rainSFX.play();
-
+        rainSFX.volume = 0.4; rainSFX.play();
         [gunshotSFX, footstepSFX, pageSFX].forEach(sfx => {
-            sfx.volume = 0;
-            sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.volume = 1; });
+            sfx.volume = 0; sfx.play().then(() => { sfx.pause(); sfx.currentTime = 0; sfx.volume = 1; });
         });
-
         document.getElementById('name-gate').style.display='none';
         document.getElementById('gate-screen').style.display='flex';
         startPoem();
@@ -140,29 +127,27 @@
             for(let char of text) { d.innerHTML += char; d.style.opacity = 1; await new Promise(r => setTimeout(r, 60)); }
             await new Promise(r => setTimeout(r, 600));
         }
-        
-        const hint = document.createElement('div');
-        hint.style.cssText = "color:#500; font-size:0.8rem; margin-top:30px; letter-spacing:10px; animation: blink 2s infinite;";
-        hint.innerText = "[ TAP TO OPEN FILE ]";
-        area.appendChild(hint);
-
         document.getElementById('gate-screen').onclick = () => {
-            pageSFX.play();
-            document.getElementById('gate-screen').style.display='none';
+            pageSFX.play(); document.getElementById('gate-screen').style.display='none';
             document.getElementById('doc').style.display='block';
         };
     }
 
+    // 核心優化：使用 Value 預填提示線條，並縮小輸入框
     function openInput(id) { 
         document.getElementById('input-panel').style.display='block'; 
         const field = document.getElementById('pass-field');
         
-        // 修正：手動設定 placeholder 提示符號
-        if(id === '1102') field.placeholder = "----";
-        else if(id === 'V') field.placeholder = "-";
-        else if(id === 'VICTOR') field.placeholder = "------";
+        let lines = "";
+        if(id === '1102') lines = "----";
+        else if(id === 'V') lines = "-";
+        else if(id === 'VICTOR') lines = "------";
         
-        field.value = ""; // 清空上次輸入
+        field.value = lines;
+        field.style.color = "#444"; // 預填線條設為暗灰色
+        field.select(); // 自動全選，使用者一打字就會蓋掉線條
+        
+        field.oninput = () => { field.style.color = "#fff"; }; // 打字時變回白色
         field.focus(); 
         window.targetKey = id; 
     }
@@ -180,8 +165,7 @@
                 if(Object.values(solved).every(v => v)) setTimeout(triggerDiary, 800);
             } else {
                 errors++;
-                footstepSFX.currentTime = 0;
-                footstepSFX.play();
+                footstepSFX.currentTime = 0; footstepSFX.play();
                 if(errors >= 3) triggerDeath();
             }
             document.getElementById('input-panel').style.display='none'; 
@@ -190,12 +174,8 @@
     }
 
     function triggerDeath() {
-        gunshotSFX.pause(); 
-        gunshotSFX.currentTime = 0; 
-        gunshotSFX.volume = 1.0;
-        
+        gunshotSFX.currentTime = 0; gunshotSFX.volume = 1.0;
         const playGunshot = gunshotSFX.play();
-        
         if (playGunshot !== undefined) {
             playGunshot.then(() => {
                 setTimeout(() => {
@@ -207,9 +187,7 @@
                         <p><strong>OBSERVATION:</strong><br>執行者：Victor。在第三次密碼驗證失敗後執行清理程序。子彈貫穿額前，受試者即刻喪失生命體徵。</p>
                     `;
                 }, 100);
-            }).catch(e => {
-                document.getElementById('scare-layer').style.display = 'flex';
-            });
+            }).catch(() => { document.getElementById('scare-layer').style.display = 'flex'; });
         }
     }
 
@@ -217,7 +195,6 @@
         pageSFX.play();
         const box = document.getElementById('doc-content');
         box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; line-height:2.6; margin-top:20px;"></div>`;
-        
         const content = [
             "【VICTOR'S PRIVATE JOURNAL】",
             "那場絕美火災是我送給 Veil 家族的『歡迎儀式』，我看著火舌吞噬宅邸就想哈哈大笑。",
@@ -226,7 +203,6 @@
             "他死守著『V』徽章在泥坑掙扎的模樣真是愚蠢，他也許以為還有人會來救他，其實將是我會出現在那又破又髒的孤兒院。",
             "只要他還在痛苦中掙扎，就是我最完美的標本。我真希望快點聽見他叫我『父親』。"
         ];
-        
         for(let text of content) {
             let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
             for(let char of text) { p.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }

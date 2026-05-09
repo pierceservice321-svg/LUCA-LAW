@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FILE_0112_LUCA_FINAL_CALIBRATION</title>
+    <title>FILE_0112_LUCA_BIRTH_FIX</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&family=Playfair+Display:wght@700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap');
         :root { --paper: #c8c8c8; --ink: #1a1a1a; --accent: #800; }
         body { background: #000; color: #ccc; font-family: 'Noto Serif TC', serif; margin: 0; overflow: hidden; height: 100vh; }
 
-        /* 18秒監視結局的核心背景 */
         #eye-bg { 
             position: fixed; top:0; left:0; width:100%; height:100%; 
             background: url('https://miro.medium.com/v2/resize:fit:1200/1*koUr4odA91ARVyQzpIQwjg.jpeg') center/cover; 
@@ -39,9 +38,16 @@
         .death-paper { width: 92%; max-width: 600px; background: #fdfdfd; color: #111; padding: 50px; border: 12px double #400; position: relative; font-family: 'Courier Prime', serif; }
         .death-stamp { position: absolute; top: 30px; right: 30px; border: 5px solid var(--accent); color: var(--accent); padding: 5px 20px; font-family: 'Playfair Display', serif; font-size: 2.2rem; transform: rotate(12deg); opacity: 0.9; font-weight: bold; }
 
-        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: #0a0a0a; padding: 40px; box-sizing: border-box; display: none; z-index: 3000; border-top: 4px solid var(--accent); }
-        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2rem; outline: none; letter-spacing: 5px; }
+        #input-panel { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(10,10,10,0.98); padding: 50px; box-sizing: border-box; display: none; z-index: 3000; border-top: 4px solid var(--accent); }
+        #pass-field { width: 100%; background: none; border: none; color: #fff; text-align: center; font-size: 2.5rem; outline: none; letter-spacing: 15px; font-family: 'Courier Prime'; }
         
+        /* 佔位符跳動動畫 */
+        #pass-field::placeholder { color: #500; animation: jump 0.6s infinite alternate ease-in-out; }
+        @keyframes jump { 
+            0% { transform: translateY(0); opacity: 0.3; } 
+            100% { transform: translateY(-8px); opacity: 0.8; } 
+        }
+
         h1 { font-size: 1.6rem; border-bottom: 3px double #333; padding-bottom: 15px; text-align: center; }
         h2 { font-size: 1.2rem; border-left: 6px solid var(--accent); padding-left: 15px; margin: 35px 0 15px; background: rgba(0,0,0,0.04); }
         p { line-height: 2.2; text-align: justify; margin-bottom: 1.5em; }
@@ -49,11 +55,11 @@
 </head>
 <body onmousemove="resetIdleTimer()" ontouchstart="resetIdleTimer()" onkeydown="resetIdleTimer()">
 
-<audio id="sfx-rain" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502554248154579065/Rain_Sounds_15_seconds_soundtrack.mp3"></audio> 
-<audio id="sfx-fire" loop src="https://cdn.discordapp.com/attachments/1484181918474833965/1502552548303962192/Fire_Crackling_-_Sound_Effect_HQ.mp3"></audio>
-<audio id="sfx-paper" src="https://assets.mixkit.co/active_storage/sfx/2049/2049-preview.mp3"></audio>
-<audio id="sfx-footstep" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502551092221706310/Horror_Footsteps_Walking_Up_Stairs_Sound_Effect.mp3"></audio>
-<audio id="sfx-gunshot" src="https://cdn.discordapp.com/attachments/1484181918474833965/1502537903354548304/Gunshot_Sound_Effect_Single_Shot.mp3"></audio>
+<audio id="sfx-rain" loop src="https://www.soundjay.com/nature/sounds/rain-01.mp3"></audio> 
+<audio id="sfx-fire" loop src="https://www.soundjay.com/nature/sounds/fire-1.mp3"></audio>
+<audio id="sfx-paper" src="https://www.soundjay.com/misc/sounds/paper-flip-1.mp3"></audio>
+<audio id="sfx-footstep" src="https://www.soundjay.com/footsteps/sounds/footsteps-4.mp3"></audio>
+<audio id="sfx-gunshot" src="https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"></audio>
 
 <div id="eye-bg"></div>
 
@@ -71,17 +77,13 @@
 <div class="report-sheet" id="doc">
     <h1>臨床行為與神經觀測詳細報告</h1>
     <div id="doc-content">
-        <p><strong>個案狀態：</strong> 盧卡 (ID: <span id="gap-1102" class="input-gap" onclick="openInput('1102')">█████</span>)</p>
-
+        <p><strong>個案狀態：</strong> Luca (BIRTH: <span id="gap-1102" class="input-gap" onclick="openInput('1102')">█████</span>)</p>
         <h2>一、 痛覺神經阻斷觀測</h2>
-        <p>早期記錄顯示，個案在遭受嚴重集體欺凌時展現出極端病理反應。個案曾被多次暴力壓制在受污染的濕冷泥土中。其面部深陷泥地，指甲因瘋狂抓撓地面而嚴重翻裂，<strong>指縫間滲出的混合了泥水與暗紅血液的液體</strong>，在低溫環境下呈現出令人不適的黏稠感。即便在這種近乎窒息且持續疼痛的處境下，個案的神經傳導卻呈現出奇特的斷裂現象，彷彿意識已主動逃離了正在受苦的軀殼。</p>
-
+        <p>早期記錄顯示，個案在遭受嚴重集體欺凌時展現出極端病理反應。個案曾被多次暴力壓制在受污染的濕冷泥土中。其面部深陷泥地，指甲因瘋狂抓撓地面而嚴重翻裂，<strong>指縫間滲出的混合了泥水與暗紅血液的液體</strong>，在低溫環境下呈現出令人不適的黏稠感。即便在這種近乎窒息且持續疼痛的處境下，個案也依舊面無表情。</p>
         <h2>二、 核心物件依附心理</h2>
-        <p>個案唯一的精神穩定性皆維繫於一枚刻有 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記的金屬徽章。那是他唯一不准任何人觸碰的「聖物」。若該物件被奪走，他會立刻陷入瘋狂的自我傷害狀態。這枚徽章是他虛假安全感的來源，也是控制其意識的核心把柄。</p>
-
+        <p>個案唯一的精神穩定性皆維繫於一枚刻有 <span id="gap-V" class="input-gap" onclick="openInput('V')">█</span> 字標記的金屬徽章。那是他唯一不准任何人觸碰的物品。</p>
         <h2>三、 監護者干預記錄</h2>
-        <p>目前個案已被置於 <span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span> 的絕對監視之下。透過精確的藥物干預與社交隔離，個案已徹底失去對外界環境的主體辨識能力。他不再具備獨立人格，僅作為其筆下一個受控、可觀測的神經反饋樣本存在於此。</p>
-
+        <p>目前個案已被置於 <span id="gap-VICTOR" class="input-gap" onclick="openInput('VICTOR')">██████</span> 的絕對監視之下。透過藥物干預與社交隔離，個案已徹底失去對外界環境的主體辨識能力。</p>
         <div style="margin-top: 80px; text-align: right; font-size: 0.9rem; border-top: 1px dashed #777; padding-top: 25px; color: #444;">
             首席觀測員： [ REDACTED ]<br>
             負責人： [ ACCESS RESTRICTED ]
@@ -90,7 +92,7 @@
 </div>
 
 <div id="input-panel">
-    <input type="text" id="pass-field" placeholder="PASSCODE..." autocomplete="off">
+    <input type="text" id="pass-field" autocomplete="off">
 </div>
 
 <div id="scare-layer">
@@ -108,7 +110,13 @@
 
     function confirmName() {
         const val = document.getElementById('user-name').value.trim();
-        if(val) { playerName = val; document.getElementById('name-gate').style.display='none'; document.getElementById('gate-screen').style.display='flex'; document.getElementById('sfx-rain').play(); startPoem(); }
+        if(val) { 
+            playerName = val; 
+            document.getElementById('name-gate').style.display='none'; 
+            document.getElementById('gate-screen').style.display='flex'; 
+            document.getElementById('sfx-rain').play(); 
+            startPoem(); 
+        }
     }
 
     async function startPoem() {
@@ -119,7 +127,11 @@
             for(let char of line) { d.innerHTML += char; await new Promise(r=>setTimeout(r, 60)); }
             await new Promise(r=>setTimeout(r, 700));
         }
-        document.getElementById('gate-screen').onclick = () => { document.getElementById('gate-screen').style.display='none'; document.getElementById('doc').style.display='block'; resetIdleTimer(); };
+        document.getElementById('gate-screen').onclick = () => { 
+            document.getElementById('gate-screen').style.display='none'; 
+            document.getElementById('doc').style.display='block'; 
+            resetIdleTimer(); 
+        };
     }
 
     function resetIdleTimer() {
@@ -127,32 +139,40 @@
         clearTimeout(idleTimer);
         document.getElementById('eye-bg').style.opacity = '0';
         document.getElementById('doc').style.filter = 'none';
-        document.getElementById('doc').style.opacity = '1';
         
         idleTimer = setTimeout(() => { 
             document.getElementById('eye-bg').style.opacity = '0.85'; 
             document.getElementById('doc').style.filter = 'blur(15px) brightness(0.2)';
-            document.getElementById('doc').style.opacity = '0.2';
         }, 18000); 
     }
 
-    function openInput(id) { document.getElementById('input-panel').style.display='block'; document.getElementById('pass-field').focus(); window.targetKey = id; }
+    function openInput(id) { 
+        const panel = document.getElementById('input-panel');
+        const field = document.getElementById('pass-field');
+        panel.style.display='block'; 
+        // 跳動橫槓邏輯：密碼 1102 對應 ----，V 對應 -，VICTOR 對應 ------
+        field.placeholder = "-".repeat(id.length); 
+        field.focus(); 
+        window.targetKey = id; 
+    }
 
     document.getElementById('pass-field').onkeypress = (e) => {
         if(e.key === 'Enter') {
             const val = e.target.value.toUpperCase().trim();
+            // 禁忌觸發
             if(val === "LUCIANO") { triggerDeath("LUCIANO_BREACH"); return; }
+            
             if(val === window.targetKey) {
-                document.getElementById('sfx-paper').currentTime = 0; document.getElementById('sfx-paper').play();
+                document.getElementById('sfx-paper').play();
                 solved[window.targetKey] = true;
                 const gap = document.getElementById('gap-' + window.targetKey);
-                gap.innerHTML = "BIRTH"; // 顯示為 BIRTH
+                // 解鎖後 BIRTH 欄位顯示「1102」
+                gap.innerHTML = window.targetKey;
                 gap.className = "solved"; gap.onclick = null;
                 if(Object.values(solved).every(v => v)) triggerDiary();
             } else {
                 errors++;
-                const foot = document.getElementById('sfx-footstep');
-                foot.currentTime = 0; foot.volume = Math.min(errors * 0.25, 1); foot.play();
+                document.getElementById('sfx-footstep').play();
                 if(errors >= 5) triggerDeath("NORMAL");
             }
             document.getElementById('input-panel').style.display='none'; e.target.value="";
@@ -161,41 +181,37 @@
 
     function triggerDeath(type) {
         document.getElementById('sfx-gunshot').play();
-        const executors = ["Victor", "Killian", "Theodore"];
-        const ex = executors[Math.floor(Math.random() * executors.length)];
+        const executors = ["Victor", "Killian", "Theodore", "Unknown Observer"];
+        const guns = ["Beretta 92FS", "Colt Python", "Glock 17", "Walther PPK", "Remington 870"];
+        const cause = ["額葉貫穿", "頸部開放性創傷", "心臟穿透性損傷", "急性中樞衰竭", "多器官功能停滯"];
+        const num = Math.floor(Math.random() * 5) + 1;
         
         setTimeout(() => {
             document.getElementById('scare-layer').style.display = 'flex';
             let content = "";
             if(type === "LUCIANO_BREACH") {
                 document.getElementById('stamp-text').innerText = "BREACHED";
-                content = `<h3 style="color:#800;">禁忌名稱存取違規</h3><p>偵測到非法姓氏存取：<strong>LUCIANO</strong></p><p><strong>執行者：</strong> VICTOR</p><p><strong>處置：</strong> 此身份「${playerName}」已從現實數據中徹底刪除。</p>`;
+                content = `<h3>禁忌存取違規</h3><p>警告：非法探聽姓氏 <strong>LUCIANO</strong></p><p>執行者：VICTOR</p><p>處置：身分「${playerName}」已從本機與伺服器端永久抹除。</p>`;
             } else {
-                content = `<h3 style="color:#800;">肅清清算報告</h3><p><strong>目標：</strong> ${playerName}<br><strong>執行者：</strong> ${ex.toUpperCase()}</p><p>現場已清理，檔案重新封印。</p>`;
+                content = `<h3>肅清處決報告</h3><p>目標：${playerName}<br>執行者：${executors[Math.floor(Math.random()*executors.length)]}<br>使用武器：${guns[Math.floor(Math.random()*guns.length)]}<br>擊發次數：${num}<br>判定死因：${cause[Math.floor(Math.random()*cause.length)]}</p>`;
             }
             document.getElementById('death-content').innerHTML = content;
         }, 150);
     }
 
     async function triggerDiary() {
-        const fire = document.getElementById('sfx-fire');
-        const rain = document.getElementById('sfx-rain');
-        fire.play();
-        let vol = 1;
-        const fade = setInterval(() => { vol -= 0.1; if (vol <= 0) { rain.pause(); clearInterval(fade); } else { rain.volume = vol; } }, 200);
-
+        document.getElementById('sfx-fire').play();
+        document.getElementById('sfx-rain').pause();
         const box = document.getElementById('doc-content');
-        box.innerHTML = `<div id="final-diary" style="color:#b00; font-size:0.95rem; line-height:2.6; font-weight:bold;"></div>`;
+        box.innerHTML = `<div id="final-diary" style="color:#b00; font-weight:bold; font-size:0.95rem; line-height:2.6;"></div>`;
         const content = [
-            "【 VICTOR'S PRIVATE JOURNAL - 19XX.07.12 】",
-            "那場我親手策劃的火災，是我送給這孩子最傑出的『演進儀式』。",
-            "我永遠忘不了他跪在焦黑的廢墟中，像條斷了脊椎的野狗般，哭著呼喊我名字的樣子。",
-            "在那一刻我就知道，他的靈魂已經徹底破碎，並且永遠屬於我了。",
-            "他死守著那枚刻有『V』的徽章，以為那是他在這世上唯一的救贖與溫暖。",
-            "其實，那是我親手釘進他精神深處的枷鎖，提醒他：他的一切痛苦皆由我賦予。",
-            "只要他還在這種痛苦與解離中掙扎，他就是我最完美、最聽話的神經樣本。",
-            "我也許會看著他徹底崩潰，或者，在那之前親手殺掉這件藝術品。",
-            "在那之前，他連選擇死亡的權利都沒有。"
+            "【 VICTOR'S PRIVATE JOURNAL 】",
+            "那場火災是我送給Veil好友的『歡迎儀式』。",
+            "我忘不了那孩子跪在廢墟中呼喊他父母名字的樣子。",
+            "他的靈魂已經破碎，並且屬於我的家族了。",
+            "他死守著『V』徽章，以為那是救贖，其實那是枷鎖，我想我應該增加一些考驗給他。",
+            "只要他還在痛苦中掙扎，就是我最完美的樣本，哈哈，看看他在泥濘中的蠢樣。",
+            "他連選擇死亡的權利都沒有。"
         ];
         for(let line of content) {
             let p = document.createElement('p'); document.getElementById('final-diary').appendChild(p);
